@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Retro Deck</title>
+  <link rel="stylesheet" href="./css/background.css">
+  <link rel="stylesheet" href="./css/carrousel.css">
+  <link rel="stylesheet" href="./css/gameCard.css">
+  <link rel="stylesheet" href="./css/loading.css">
+  <link rel="stylesheet" href="./css/responsive.css">
+  <link rel="stylesheet" href="./css/variables.css">
+</head>
+<body>
+  <div id="background"></div>
+
+  <div id="loading">
+    <div class="loading-spinner"></div>
+    <p>Loading games...</p>
+  </div>
+
+  <div id="game-selector">
+    <h1 class="select-game-title">Select game</h1>
+    <div id="carousel-container">
+      <button id="prev-button"></button>
+      <div id="game-list" class="carousel"></div>
+      <button id="next-button"></button>
+    </div>
+  </div>
+  <script src="../../dist/views/renderGames.js" defer></script>
+</body>
+</html

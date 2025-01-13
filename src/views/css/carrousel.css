@@ -1,0 +1,64 @@
+#carousel-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 60vh;
+}
+
+#prev-button,
+#next-button {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 50%;
+  z-index: 20;
+}
+
+#prev-button {
+  left: 10px;
+  width: 0;
+  height: 0;
+  border-top: 6vw solid transparent;
+  border-bottom: 6vw solid transparent;
+  border-right: 8vw solid #007bff;
+}
+
+#next-button {
+  right: 10px;
+  width: 0;
+  height: 0;
+  border-top: 6vw solid transparent;
+  border-bottom: 6vw solid transparent;
+  border-left: 8vw solid #007bff;
+}
+
+#prev-button:hover {
+  transform: scale(1.05);
+  border-right: 10vw solid #007bff;
+}
+
+#next-button:hover {
+  transform: scale(1.05);
+  border-left: 10vw solid #007bff;
+}
+
+#prev-button:active {
+  transform: scale(1.05);
+  border-right: 10vw solid #fff;
+}
+
+#next-button:active {
+  transform: scale(1.05);
+  border-left: 10vw solid #fff;
+}
+
+#prev-button:active,
+#next-button:active {
+  transform: scale(1.15);
+}
