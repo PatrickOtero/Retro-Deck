@@ -1,0 +1,112 @@
+#emulator-list-container {
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(20, 20, 20, 0.9);
+    border-radius: 12px;
+    padding: 25px;
+    z-index: 10;
+    width: 80%;
+    max-width: 600px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    background: url('retro-texture.png') repeat, rgba(20, 20, 20, 0.9);
+    background-size: contain;
+}
+
+.emulators-list {
+    max-height: 60vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-right: 15px;
+}
+
+.emulator-item {
+    padding: 15px;
+    font-size: 18px;
+    font-family: 'Press Start 2P', cursive;
+    color: #e0e0e0;
+    background-color: #2b2b2b;
+    border: 2px solid #888;
+    border-radius: 8px;
+    margin: 8px 0;
+    cursor: pointer;
+    text-shadow: 0 0 2px rgba(255, 255, 255, 0.3);
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    width: 100%;
+    max-width: 480px;
+    text-align: center;
+}
+
+.emulator-item:hover {
+    background-color: #3a3a3a;
+    transform: translateY(-3px);
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.6);
+}
+
+.emulators-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.emulators-list::-webkit-scrollbar-track {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+}
+
+.emulators-list::-webkit-scrollbar-thumb {
+    background-color: #555;
+    border-radius: 6px;
+}
+
+.emulators-list::-webkit-scrollbar-thumb:hover {
+    background-color: #777;
+}
+
+.game-list-item-container {
+    position: relative;
+    padding: 18px;
+    margin-bottom: 12px;
+    background-color: rgba(40, 40, 40, 0.9);
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.game-list-item-container:hover {
+    transform: scale(1.03);
+    box-shadow: 0 0 12px rgba(255, 255, 255, 0.4);
+}
+
+.game-list-item-container:before {
+    content: '';
+    position: absolute;
+    background: linear-gradient(45deg, #666, #444, #666);
+    border-radius: 10px;
+    z-index: -1;
+    filter: blur(4px);
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.emulator-title {
+    background-color: #444;
+    color: #f0f0f0;
+    margin: 8px 0;
+    padding: 12px;
+    cursor: pointer;
+    text-align: center;
+    font-size: 20px;
+    border-radius: 6px;
+    font-family: 'Press Start 2P', cursive;
+    transition: background-color 0.3s ease;
+}
+
+.emulator-title:hover {
+    background-color: #555; 
+}

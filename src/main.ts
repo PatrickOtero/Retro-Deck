@@ -19,7 +19,7 @@ function createWindow() {
 
   mainWindow.loadFile(path.join(__dirname, '..', 'src', 'views', 'index.html'));
 
-  new GameController(mainWindow);
+  new GameController();
 }
 
 app.whenReady().then(createWindow);

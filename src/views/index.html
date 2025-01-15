@@ -4,12 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Retro Deck</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./css/background.css">
   <link rel="stylesheet" href="./css/carrousel.css">
   <link rel="stylesheet" href="./css/gameCard.css">
   <link rel="stylesheet" href="./css/loading.css">
-  <link rel="stylesheet" href="./css/responsive.css">
   <link rel="stylesheet" href="./css/variables.css">
+  <link rel="stylesheet" href="./css/emulatorList.css">
 </head>
 <body>
   <div id="background"></div>
@@ -19,14 +20,25 @@
     <p>Loading games...</p>
   </div>
 
+  <div id="emulator-list-container">
+    <div class="emulators-list">
+    </div>
+  </div>
+
   <div id="game-selector">
     <h1 class="select-game-title">Select game</h1>
+    <div class="icon-container">
+      <img class="atari-control" src="../../assets/joystic-retro-deck.png" alt="Joystick Icon">
+      <img class="snes-control" src="../../assets/snes-retro-deck.png">
+      <img class="nes-control" src="../../assets/nes-retro-deck.png"> 
+      <img class="sega-control" src="../../assets/sega-retro-deck.png"> 
+    </div>
     <div id="carousel-container">
       <button id="prev-button"></button>
       <div id="game-list" class="carousel"></div>
       <button id="next-button"></button>
     </div>
   </div>
-  <script src="../../dist/views/renderGames.js" defer></script>
+  <script src="../../dist/views/index.js" defer></script>
 </body>
 </html

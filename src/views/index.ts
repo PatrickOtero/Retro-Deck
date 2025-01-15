@@ -1,7 +1,15 @@
 const gameListElement = document.getElementById('game-list') as HTMLElement;
+const emulatorListElement = document.querySelector('.emulators-list') as HTMLElement;
+const emulatorListContainerElement = document.getElementById('emulator-list-container') as HTMLElement;
 const prevButton = document.getElementById('prev-button') as HTMLElement;
 const nextButton = document.getElementById('next-button') as HTMLElement;
+const toggleButton = document.getElementById('toggle-button');
+const closeButton = document.getElementById('close-button') as HTMLElement;
+
+let selectedEmulator: any = null;
+
 let games: Array<any> = [];
+let emulators: Array<any> = []
 let currentIndex: number = 0;
 
 let isButtonAPressed = false;
@@ -102,16 +110,94 @@ window.onload = generateStars;
 window.addEventListener('resize', () => {
   generateStars();
   renderGames();
+  // renderEmulators()
 });
+
+console.log(emulators)
+
+async function loadEmulators(): Promise<void> {
+  try {
+    const loadingElement = document.getElementById('loading')!;
+    loadingElement.style.opacity = '1';
+
+    if (emulators.length === 0) {
+      console.log('Chamando registerEmulators...');
+  
+      await window.electronAPI.registerEmulator();
+
+      console.log('Emuladores registrados com sucesso');
+    }
+
+    emulators = await window.electronAPI.getEmulator();
+
+    console.log(emulators);
+
+    nextButton.style.display = "none"
+    prevButton.style.display = "none"
+
+    renderEmulators();
+    loadingElement.style.opacity = '0';
+    setTimeout(() => {
+      loadingElement.style.display = 'none';
+    }, 500);
+  } catch (error) {
+    console.error('Erro ao carregar emuladores:', error);
+  }
+}
+
+function renderEmulators(): void {
+  if (emulators.length === 0) {
+    console.log('Nenhum emulador encontrado.');
+    return;
+  }
+
+  emulatorListElement.innerHTML = ''; 
+
+  const emulatorContainer = createEmulatorContainer(emulators);
+
+  emulatorListElement.appendChild(emulatorContainer);
+}
+
+function createEmulatorContainer(emulators: any): HTMLElement {
+  const container = document.createElement('div');
+  container.classList.add('game-list-item-container');
+
+  for (let emulator of emulators) {
+    const emulatorTitle = document.createElement('h3');
+    emulatorTitle.classList.add('emulator-title');
+    emulatorTitle.textContent = emulator.emulatorName;
+
+    emulatorTitle.onclick = () => selectEmulator(emulator);
+
+    container.appendChild(emulatorTitle);
+  }
+
+  return container;
+}
+
+function selectEmulator(emulator: any): void {
+  selectedEmulator = emulator;
+  console.log('Emulador selecionado:', selectedEmulator);
+
+  emulatorListElement.classList.add('hidden');
+
+  const gameSelector = document.getElementById('game-selector');
+  if (gameSelector) {
+    gameSelector.style.display = 'block';
+    nextButton.style.display = "block"
+    prevButton.style.display = "block"
+    emulatorListContainerElement.style.display = "none"
+  }
+
+  loadGames();
+}
 
 async function loadGames(): Promise<void> {
   try {
-    
     const loadingElement = document.getElementById('loading')!;
     loadingElement.style.opacity = '1';
 
     games = await window.electronAPI.getGames();
-    console.log('Games from backend:', games);
 
     if (games.length === 0) {
       displayNoGamesMessage();
@@ -124,8 +210,6 @@ async function loadGames(): Promise<void> {
     setTimeout(() => {
       loadingElement.style.display = 'none';
     }, 500); 
-
-    generateStars();
   } catch (error) {
     console.error('Erro ao carregar jogos:', error);
   }
@@ -147,7 +231,6 @@ function renderGames(): void {
   gameListElement.appendChild(gameContainer);
 }
 
-
 function createGameContainer(game: any): HTMLElement {
   const container = document.createElement('div');
   container.classList.add("game-info-container");
@@ -158,7 +241,7 @@ function createGameContainer(game: any): HTMLElement {
   const img = document.createElement('img');
   img.classList.add('game-image');
   img.src = game.backgroundImage || 'placeholder.png';
-  img.alt = game.name;
+  img.alt = game.gameName;
 
   imageContainer.appendChild(img);
 
@@ -166,7 +249,7 @@ function createGameContainer(game: any): HTMLElement {
   nameContainer.classList.add('game-name-container');
 
   const h3 = document.createElement('h3');
-  h3.textContent = game.name;
+  h3.textContent = game.gameName;
   nameContainer.appendChild(h3);
 
   const descContainer = document.createElement('div');
@@ -190,6 +273,11 @@ function createGameContainer(game: any): HTMLElement {
 }
 
 async function startGame() {
+  if (!selectedEmulator) {
+    alert('Selecione um emulador primeiro!');
+    return;
+  }
+
   const isRunning = await window.electronAPI.isEmulatorRunning();
 
   if (isRunning) {
@@ -197,7 +285,7 @@ async function startGame() {
     return;
   }
 
-  const result = await window.electronAPI.runGame(games[currentIndex].fileName);
+  const result = await window.electronAPI.runGame(games[currentIndex].fileName, selectedEmulator.emulatorName);
 
   if (!result.success) {
     console.error('Erro ao tentar iniciar o jogo.');
@@ -219,4 +307,4 @@ function moveToPrevGame(): void {
 prevButton.addEventListener('click', moveToPrevGame);
 nextButton.addEventListener('click', moveToNextGame);
 
-loadGames();
+loadEmulators();
