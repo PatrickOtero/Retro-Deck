@@ -105,12 +105,41 @@ function moveStar(star: HTMLElement): void {
   animateStar(); 
 }
 
-window.onload = generateStars;
+function arrangeIconsRandomly() {
+  const icons = Array.from(document.querySelectorAll<HTMLDivElement>('.icon'));
+  const positions = [0, 1, 2, 3];
+
+  for (let i = positions.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [positions[i], positions[j]] = [positions[j], positions[i]];
+  }
+
+  icons.forEach((icon, index) => {
+    const newPosition = positions[index];
+    icon.style.order = String(newPosition);
+  });
+}
+
+function applyRandomRotation() {
+  const icons = document.querySelectorAll<HTMLElement>('.icon');
+  
+  icons.forEach(icon => {
+    const randomDegree = Math.floor(Math.random() * 360);
+    icon.style.transform = `rotate(${randomDegree}deg)`;
+  });
+}
+
+window.onload = () => {
+  arrangeIconsRandomly();
+  applyRandomRotation();
+  generateStars()
+};
 
 window.addEventListener('resize', () => {
+  arrangeIconsRandomly();
+  applyRandomRotation();
   generateStars();
   renderGames();
-  // renderEmulators()
 });
 
 console.log(emulators)
@@ -121,16 +150,11 @@ async function loadEmulators(): Promise<void> {
     loadingElement.style.opacity = '1';
 
     if (emulators.length === 0) {
-      console.log('Chamando registerEmulators...');
   
       await window.electronAPI.registerEmulator();
-
-      console.log('Emuladores registrados com sucesso');
     }
 
     emulators = await window.electronAPI.getEmulator();
-
-    console.log(emulators);
 
     nextButton.style.display = "none"
     prevButton.style.display = "none"

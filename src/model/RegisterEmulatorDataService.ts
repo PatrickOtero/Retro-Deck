@@ -11,27 +11,30 @@ export class RegisterEmulatorService {
     console.log(this.emulatorPath)
   }
 
+  async filterValidExecutables(files: string[]): Promise<string[]> {
+    return files.filter(file => {
+      const filePath = path.join(this.emulatorPath, file);
+      const stats = fs.statSync(filePath);
+  
+      return stats.size > 3 * 1024 * 1024; 
+    });
+  }
 
   async registerEmulator(): Promise<{ message: string }[]> {
     const files = fs.readdirSync(this.emulatorPath).filter(file =>
       file.endsWith('.exe')
     );
+    const validExecutables = await this.filterValidExecutables(files);
 
-    console.log(files)
+    const emulatorDataPromises = validExecutables.map(async (validExecutable) => {
+      const emulatorName = path.parse(validExecutable).name;
 
-    const emulatorDataPromises = files.map(async (file) => {
-      const emulatorName = path.parse(file).name;
-
-      console.log(emulatorName)
-
-        try {
-          const response = await axiosInstance.post<{ message: string }>(
-            `/saveEmulator`,
-            { emulatorName }
-          );
-
-          console.log(response.data)
-
+      try {
+        const response = await axiosInstance.post<{ message: string }>(
+          `/saveEmulator`,
+          { emulatorName }
+        );
+        
         return { message: response.data.message };
 
       } catch (error: any) {

@@ -46,42 +46,27 @@ body {
 
 .icon-container {
   display: flex;
-  transform: rotate(25deg);
-  z-index: 100;
+  justify-content: space-between;
+  align-items: center;
+  width: 80%;
+  margin: 20px auto;
+  position: relative;
+}
+
+.icon {
+  width: 80px;
+  height: 80px;
+  transition: transform 0.5s ease, left 0.5s ease, top 0.5s ease;
+}
+
+.rotated {
+  transform: rotate(360deg);
 }
 
 .icon-container img {
   width: 80px;
   height: auto;
   animation: float 1.5s infinite ease-in-out;
-}
-
-.snes-control {
-  position: absolute;
-
-  top: -100px;
-  right: 5% ;
-}
-
-.nes-control {
-  position: absolute;
-
-  top: -200px;
-  right: 8% ;
-}
-
-.sega-control {
-  position: absolute;
-
-  left: 10% ;
-  top: 500px;
-}
-
-.atari-control {
-  position: absolute;
-
-  top: 500px;
-  left: 20% ;
 }
 
 @keyframes float {
