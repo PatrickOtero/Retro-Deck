@@ -17,8 +17,8 @@
   top: 50%;
   transform: translateY(-50%);
   z-index: 9;
-  width: 18vw;  /* Tamanho do botão */
-  height: 18vw; /* Tamanho do botão */
+  width: 18vw;
+  height: 18vw;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -26,7 +26,6 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
-/* Ajustando a posição das setas */
 #prev-button {
   left: 15px;
 }
@@ -35,54 +34,47 @@
   right: 15px;
 }
 
-/* Aumentando o tamanho da seta */
 #prev-button img,
 #next-button img {
-  width: 70%;  /* Tamanho da seta */
-  height: 70%; /* Tamanho da seta */
+  width: 70%;  
+  height: 70%; 
   transition: all 0.3s ease;
   filter: drop-shadow(0 0 8px rgba(0, 0, 0, 0.4));
 }
 
-/* Efeito de hover retro */
 #prev-button:hover,
 #next-button:hover {
-  box-shadow: 0 0 20px 5px rgba(255, 0, 255, 0.8); /* Brilho neon */
+  box-shadow: 0 0 20px 5px rgba(255, 0, 255, 0.8);
   transform: translateY(-50%) scale(1.1);
   animation: glow 1s infinite alternate;
-  transform-origin: center center; /* Garantir que a transformação de escala aconteça no centro */
+  transform-origin: center center;
 }
 
-/* Efeito de click */
 #prev-button:active,
 #next-button:active {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-  transform: scale(0.95); /* Redução no clique */
+  transform: scale(0.95);
 }
 
-/* Removendo outline quando o botão recebe foco */
 #prev-button:focus,
 #next-button:focus {
   outline: none;
 }
 
-/* Efeito de brilho nas setas (hover) */
 #prev-button:hover img,
 #next-button:hover img {
-  filter: drop-shadow(0 0 25px rgba(255, 0, 255, 1)); /* Brilho neon */
-  transform: scale(1.2); /* Aumento da seta no hover */
+  filter: drop-shadow(0 0 25px rgba(255, 0, 255, 1));
+  transform: scale(1.2);
 }
 
-/* Ajuste para evitar desalinhamento da seta direita */
 #prev-button:hover,
 #next-button:hover {
-  /* Ajuste de transformações */
   transform: scale(1.1) translateY(-50%); 
 }
 
 #prev-button:active img,
 #next-button:active img {
-  transform: scale(1.05); /* Leve aumento ao clicar */
+  transform: scale(1.05);
 }
 
 @keyframes glow {

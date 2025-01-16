@@ -5,6 +5,7 @@ const prevButton = document.getElementById('prev-button') as HTMLElement;
 const nextButton = document.getElementById('next-button') as HTMLElement;
 const toggleButton = document.getElementById('toggle-button');
 const closeButton = document.getElementById('close-button') as HTMLElement;
+const loadingElement = document.getElementById('loading')!;
 
 let selectedEmulator: any = null;
 
@@ -181,28 +182,37 @@ window.addEventListener('resize', () => {
 
 console.log(emulators)
 
+function showLoading(): void {
+  loadingElement.style.display = 'flex';
+  loadingElement.style.opacity = '1';
+  loadingElement.style.pointerEvents = 'auto';
+}
+
+function hideLoading(): void {
+  loadingElement.style.opacity = '0';
+  setTimeout(() => {
+    loadingElement.style.display = 'none';
+  }, 500);
+}
+
 async function loadEmulators(): Promise<void> {
   try {
-    const loadingElement = document.getElementById('loading')!;
-    loadingElement.style.opacity = '1';
+    showLoading();
 
     if (emulators.length === 0) {
-  
       await window.electronAPI.registerEmulator();
     }
 
     emulators = await window.electronAPI.getEmulator();
-
-    nextButton.style.display = "none"
-    prevButton.style.display = "none"
+    nextButton.style.display = "none";
+    prevButton.style.display = "none";
 
     renderEmulators();
-    loadingElement.style.opacity = '0';
-    setTimeout(() => {
-      loadingElement.style.display = 'none';
-    }, 500);
+
+    hideLoading();
   } catch (error) {
     console.error('Erro ao carregar emuladores:', error);
+    hideLoading();
   }
 }
 
@@ -240,14 +250,18 @@ function selectEmulator(emulator: any): void {
   selectedEmulator = emulator;
   console.log('Emulador selecionado:', selectedEmulator);
 
+  const loadingElement = document.getElementById('loading')!;
+  loadingElement.style.display = 'block'; 
+  loadingElement.style.opacity = '1';
+
   emulatorListElement.classList.add('hidden');
 
   const gameSelector = document.getElementById('game-selector');
   if (gameSelector) {
     gameSelector.style.display = 'block';
-    nextButton.style.display = "block"
-    prevButton.style.display = "block"
-    emulatorListContainerElement.style.display = "none"
+    nextButton.style.display = "block";
+    prevButton.style.display = "block";
+    emulatorListContainerElement.style.display = "none";
   }
 
   loadGames(emulator.romExtensions);
@@ -259,28 +273,25 @@ function selectEmulator(emulator: any): void {
 
 async function loadGames(supportedExtensions: string[]): Promise<void> {
   try {
-    const loadingElement = document.getElementById('loading')!;
-    loadingElement.style.opacity = '1';
+    showLoading();
 
     games = await window.electronAPI.getGames(supportedExtensions);
 
     if (games.length === 0) {
       displayNoGamesMessage();
+      hideLoading();
       return;
     }
 
     renderGames();
-
-    loadingElement.style.opacity = '0';
-    setTimeout(() => {
-      loadingElement.style.display = 'none';
-    }, 500);
+    hideLoading();
 
     if (isFirstEmulatorSelected) {
       closeEmulatorMenu();
     }
   } catch (error) {
     console.error('Erro ao carregar jogos:', error);
+    hideLoading();
   }
 }
 
