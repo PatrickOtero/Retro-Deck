@@ -8,7 +8,6 @@ export class RegisterEmulatorService {
 
   constructor() {
     this.emulatorPath = path.join(app.getAppPath(), 'emulators');
-    console.log(this.emulatorPath)
   }
 
   async filterValidExecutables(files: string[]): Promise<string[]> {

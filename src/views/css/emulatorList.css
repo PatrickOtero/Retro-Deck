@@ -107,6 +107,14 @@
     transition: background-color 0.3s ease;
 }
 
+.emulator-title.selected {
+    background-color: #444;
+    color: #fff;
+    padding: 5px;
+    border-radius: 5px;
+    outline: 2px solid #fff;
+  }
+
 .emulator-title:hover {
     background-color: #555; 
 }

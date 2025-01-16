@@ -16,10 +16,23 @@ let currentIndex: number = 0;
 let isButtonAPressed = false;
 let isButtonStartPressed = false;
 let lastAxisX = 0;
+let lastAxisY = 0;
 let moveCooldown = false; 
 
-let isEmulatorMenuOpen = false;
+let isEmulatorMenuOpen = true;
 let isFirstEmulatorSelected = false;
+
+let emulatorIndex = 0;
+
+function highlightEmulator(index: number): void {
+  const emulatorTitles = document.querySelectorAll<HTMLHeadingElement>('.emulator-title');
+  
+  emulatorTitles.forEach((title, i) => {
+    title.classList.toggle('selected', i === index);
+  });
+}
+
+highlightEmulator(emulatorIndex);
 
 function detectGamepad(): void {
   const gamepads = navigator.getGamepads();
@@ -29,6 +42,7 @@ function detectGamepad(): void {
 
     if (gamepad) {
       
+      if ( !isEmulatorMenuOpen ) {
       if (gamepad.buttons[0].pressed && !isButtonAPressed) { 
         isButtonAPressed = true;
         startGame(); 
@@ -39,38 +53,64 @@ function detectGamepad(): void {
       if (gamepad.buttons[9].pressed && !isButtonStartPressed) { 
         isButtonStartPressed = true;
 
-        if (isEmulatorMenuOpen && isFirstEmulatorSelected) {
+        if (isFirstEmulatorSelected) {
+        if (isEmulatorMenuOpen) {
           closeEmulatorMenu();
         } else {
           openEmulatorMenu();
         }
+      }
       } else if (!gamepad.buttons[9].pressed) {
         isButtonStartPressed = false;
       }
 
-      if (gamepad.axes[0] > 0.2 && !moveCooldown) { 
-        moveToNextGame(); 
-        lastAxisX = gamepad.axes[0];
-        moveCooldown = true; 
-        setTimeout(() => { moveCooldown = false; }, 300); 
-      } else if (gamepad.axes[0] < -0.2 && !moveCooldown) { 
-        moveToPrevGame(); 
-        lastAxisX = gamepad.axes[0];
+      const axisX = gamepad.axes[0];
+
+      if (Math.abs(axisX) > 0.2 && !moveCooldown) { 
+        axisX > 0 ? moveToNextGame() : moveToPrevGame();
+        lastAxisX = axisX;
         moveCooldown = true; 
         setTimeout(() => { moveCooldown = false; }, 300); 
       }
+    }
+
+      if (isEmulatorMenuOpen) {
+
+      const axisY = gamepad.axes[1]; 
+
+      if (Math.abs(axisY) > 0.2 && !moveCooldown) { 
+
+        const emulatorTitles = document.querySelectorAll<HTMLHeadingElement>('.emulator-title');
+
+        if (axisY < -0.2) { 
+          emulatorIndex = (emulatorIndex - 1 + emulatorTitles.length) % emulatorTitles.length;
+          highlightEmulator(emulatorIndex);
+        } else if (axisY > 0.2) { 
+          emulatorIndex = (emulatorIndex + 1) % emulatorTitles.length;
+          highlightEmulator(emulatorIndex);
+        }
+        lastAxisY = axisY;
+        moveCooldown = true;
+        setTimeout(() => { moveCooldown = false; }, 300); 
+      }
+
+      
+      if (gamepad.buttons[8].pressed) { 
+        selectEmulator(emulators[emulatorIndex]); 
+      }
+    }
     }
   }
 
   requestAnimationFrame(detectGamepad); 
 }
 
-function openEmulatorMenu(): void {
-  isEmulatorMenuOpen = true;
+detectGamepad();
 
+function openEmulatorMenu(): void {
   emulatorListElement.classList.remove('hidden');
   emulatorListContainerElement.style.display = 'block';
-  
+
   const gameSelector = document.getElementById('game-selector');
   if (gameSelector && isFirstEmulatorSelected) {
     gameSelector.style.display = 'none';
@@ -78,6 +118,12 @@ function openEmulatorMenu(): void {
 
   nextButton.style.display = 'none';
   prevButton.style.display = 'none';
+
+  const gameContainers = document.querySelectorAll('.game-info-container');
+  gameContainers.forEach((container) => {
+    container.setAttribute('tabindex', '-1');
+    container.classList.remove('focused');
+  });
 }
 
 function closeEmulatorMenu(): void {
@@ -94,8 +140,6 @@ function closeEmulatorMenu(): void {
   nextButton.style.display = "block";
   prevButton.style.display = "block";
 }
-
-detectGamepad();
 
 function generateStars(): void {
   const starCount = Math.floor(window.innerWidth * window.innerHeight / 10000); 
@@ -180,7 +224,52 @@ window.addEventListener('resize', () => {
   renderGames();
 });
 
-console.log(emulators)
+window.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape') {
+    if (isFirstEmulatorSelected) {
+    if (isEmulatorMenuOpen) {
+      closeEmulatorMenu();
+    } else {
+      openEmulatorMenu();
+    }
+  }
+  }
+
+  const emulatorTitles = document.querySelectorAll<HTMLHeadingElement>('.emulator-title');
+
+  if (emulatorTitles.length === 0 || !isEmulatorMenuOpen) return;
+
+  switch (event.key.toLowerCase()) {
+    case 'arrowup':
+    case 'w':
+      emulatorIndex = (emulatorIndex - 1 + emulatorTitles.length) % emulatorTitles.length;
+      highlightEmulator(emulatorIndex);
+      break;
+
+    case 'arrowdown':
+    case 's':
+      emulatorIndex = (emulatorIndex + 1) % emulatorTitles.length;
+      highlightEmulator(emulatorIndex);
+      break;
+
+    case 'arrowright':
+    case 'd':
+      moveToNextGame();
+      break;
+
+    case 'arrowleft':
+    case 'a':
+      moveToPrevGame();
+      break;
+
+    case 'enter':
+      selectEmulator(emulators[emulatorIndex]);
+      if (document.activeElement?.classList.contains('game-info-container')) {
+        startGame();
+      }
+      break;
+    }
+});
 
 function showLoading(): void {
   loadingElement.style.display = 'flex';
@@ -275,6 +364,10 @@ async function loadGames(supportedExtensions: string[]): Promise<void> {
   try {
     showLoading();
 
+    if (games.length === 0) {
+      await window.electronAPI.searchAndSaveGames(supportedExtensions)
+    }
+
     games = await window.electronAPI.getGames(supportedExtensions);
 
     if (games.length === 0) {
@@ -314,6 +407,15 @@ function renderGames(): void {
 function createGameContainer(game: any): HTMLElement {
   const container = document.createElement('div');
   container.classList.add("game-info-container");
+  container.setAttribute('tabindex', '0');
+
+  container.addEventListener('focus', () => {
+    container.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+  });
+
+  container.addEventListener('blur', () => {
+    container.classList.remove('focused');
+  });
 
   const imageContainer = document.createElement('div');
   imageContainer.classList.add('game-image-container');

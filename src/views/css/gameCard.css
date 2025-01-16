@@ -106,6 +106,16 @@ body {
   box-shadow: 0 0 25px #ff00ff, 0 0 50px #00ffff, 0 0 75px #ff00ff;
 }
 
+.game-info-container:focus {
+  outline: 2px solid #00f;
+  transform: scale(1.05);
+  transition: transform 0.2s ease, outline 0.2s ease;
+}
+
+.game-info-container.focused {
+  box-shadow: 0 0 10px rgba(0, 0, 255, 0.5);
+}
+
 .game-name-container h3 {
   font-size: 1.2rem;
   color: #ffcc00;

@@ -1,9 +1,10 @@
 import * as path from 'path';
 import { app } from 'electron';
-import { GameListService } from './GameListService';
+import { GameListService } from './getGamesListService';
 import { Emulator, Game } from '../interfaces/interfaces';
 import { EmulatorListService } from './getEmulatorListService';
-import { RegisterEmulatorService } from './RegisterEmulatorDataService';
+import { RegisterEmulatorService } from './registerEmulatorDataService';
+import { SearchOnRawgAndSaveOnDb } from './searchOnRawgAndSaveOnDb';
 
 export class GameModel {
   private romsPath: string;
@@ -11,6 +12,7 @@ export class GameModel {
   private gameListService: GameListService;
   private emulatorListService: EmulatorListService
   private registerEmulatorService: RegisterEmulatorService
+  private searchOnRawgAndSaveOnDb: SearchOnRawgAndSaveOnDb;
 
   constructor() {
     this.romsPath = path.join(app.getAppPath(), 'roms');
@@ -18,6 +20,11 @@ export class GameModel {
     this.gameListService = new GameListService();
     this.emulatorListService = new EmulatorListService()
     this.registerEmulatorService = new RegisterEmulatorService()
+    this.searchOnRawgAndSaveOnDb = new SearchOnRawgAndSaveOnDb();
+  }
+
+  async searchAndSaveGames(supportedExtensions: string[]): Promise<{ message: string }[]> {
+    return this.searchOnRawgAndSaveOnDb.searchOnRawgAndSaveOnDb(supportedExtensions);
   }
 
   async getGamesList(supportedExtensions: string[]): Promise<Game[]> {

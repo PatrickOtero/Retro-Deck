@@ -17,6 +17,18 @@ export class GameController {
 
   private setupIpcHandlers(): void {
 
+    ipcMain.handle('search-and-save-games', async (event, supportedExtensions: string[]): Promise<{ message: string }[]> => {
+      console.log('Search and save games executado!', supportedExtensions);
+    
+      if (!supportedExtensions || supportedExtensions.length === 0) {
+        console.error('Nenhuma extensão fornecida.');
+        return [{ message: 'Nenhuma extensão fornecida.' }];
+      }
+    
+      const result = await this.gameModel.searchAndSaveGames(supportedExtensions);
+      return result;
+    });
+
     ipcMain.handle('get-games', async (event, supportedExtensions: string[]): Promise<Game[]> => {
       console.log("Get games executado!", supportedExtensions)
 
@@ -38,7 +50,6 @@ export class GameController {
     ipcMain.handle('get-emulator', async (): Promise<Emulator[] | { message: string} []> => {
       console.log("Get emulators executado!")
       const emulators = await this.gameModel.getEmulatorList();
-      console.log('Emulators fetched:', emulators);
       return emulators;
     });
 
