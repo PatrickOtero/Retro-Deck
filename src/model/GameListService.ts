@@ -11,9 +11,9 @@ export class GameListService {
     this.romsPath = path.join(app.getAppPath(), 'roms');
   }
 
-  async getGamesList(): Promise<Game[]> {
-    const files = fs.readdirSync(this.romsPath).filter(file =>
-      file.endsWith('.bin') || file.endsWith('.smd') || file.endsWith('.md')
+  async getGamesList(supportedExtensions: string[]): Promise<Game[]> {
+    const files = fs.readdirSync(this.romsPath).filter(file => 
+      supportedExtensions.some(ext => file.endsWith(ext))
     );
 
     const gameDataPromises = files.map(async (file) => {

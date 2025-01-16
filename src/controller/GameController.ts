@@ -17,9 +17,15 @@ export class GameController {
 
   private setupIpcHandlers(): void {
 
-    ipcMain.handle('get-games', async (): Promise<Game[]> => {
-      console.log("Get games executado!")
-      const games = await this.gameModel.getGamesList();
+    ipcMain.handle('get-games', async (event, supportedExtensions: string[]): Promise<Game[]> => {
+      console.log("Get games executado!", supportedExtensions)
+
+      if (!supportedExtensions || supportedExtensions.length === 0) {
+        console.error('Nenhuma extensão fornecida.');
+        return [];
+      }
+
+      const games = await this.gameModel.getGamesList(supportedExtensions);
       return games;
     });
 

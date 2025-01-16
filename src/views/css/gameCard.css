@@ -64,9 +64,12 @@ body {
 }
 
 .icon-container img {
+  position: relative;
   width: 80px;
   height: auto;
   animation: float 1.5s infinite ease-in-out;
+
+  top: 5%;
 }
 
 @keyframes float {
@@ -80,36 +83,34 @@ body {
 
 .game-info-container {
   display: flex;
-  justify-content: center;
-  align-items: center;
   flex-direction: column;
-  width: 30vw;
-  height: 70vh;
-  gap: 20px;
-  background-color: var(--dark-background);
-  border-radius: var(--border-radius);
-  box-shadow: var(--box-shadow-normal);
-  padding: 20px;
+  align-items: center;
+  justify-content: flex-start;
+  width: 300px;
+  height: 450px;
+  padding: 15px;
+  border: 4px solid #ff00ff;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #3b0743, #1b0f4a, #28015c);
+  box-shadow: 0 0 20px #ff00ff, 0 0 40px #00ffff, 0 0 60px #ff00ff;
+  color: #fff;
+  font-family: 'Press Start 2P', cursive;
+  text-align: center;
+  overflow: hidden;
   position: relative;
-  transition: all var(--transition-speed) ease-in-out;
-  background: linear-gradient(135deg, #490579, #3b74be);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .game-info-container:hover {
-  transform: scale(1.05);
-  border-radius: var(--border-radius-hover);
-  box-shadow: var(--box-shadow-hover);
-  opacity: 1;
+  transform: scale(1.1);
+  box-shadow: 0 0 25px #ff00ff, 0 0 50px #00ffff, 0 0 75px #ff00ff;
 }
 
 .game-name-container h3 {
-  font-family: 'Bangers', sans-serif;
-  font-size: var(--font-size-game-name);
-  color: var(--highlight-text);
-  text-shadow: var(--text-shadow-game-name);
-  margin: 0;
-  text-align: center;
-  transition: all 0.3s ease;
+  font-size: 1.2rem;
+  color: #ffcc00;
+  text-shadow: 0 0 4px #00ff00, 0 0 8px #ff0000;
+  margin: 10px 0;
 }
 
 .game-name-container h3:hover {
@@ -119,16 +120,14 @@ body {
 }
 
 .game-image-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: 40%;
+  width: 90%;
+  height: 150px;
+  background-color: #000;
+  border: 3px solid #ffcc00;
+  border-radius: 12px;
+  margin-bottom: 15px;
   overflow: hidden;
-  border-radius: var(--border-radius);
-  background: rgba(0, 0, 0, 0.4);
-  box-shadow: var(--box-shadow-normal);
-  transition: all var(--transition-speed) ease;
+  box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.2);
 }
 
 .game-image-container:hover {
@@ -139,26 +138,26 @@ body {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 15px;
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease;
 }
 
 .game-image-container:hover .game-image {
-  transform: scale(1.05);
+  transform: scale(1.1);
 }
 
 .desc-container {
-  height: 20vh;
-  width: 28vw;
-  overflow-y: auto;
-  background-color: rgba(34, 34, 34, 0.9);
+  width: 90%;
+  height: 100px;
   padding: 10px;
-  border-radius: 12px;
-  font-family: 'Arial', sans-serif;
-  font-size: var(--font-size-desc);
-  color: #ddd;
-  text-shadow: 1px 1px 8px rgba(0, 0, 0, 0.7);
-  transition: all 0.3s ease;
+  background: rgba(0, 0, 0, 0.8);
+  color: #ccc;
+  border: 2px solid #00ffff;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  overflow-y: auto;
+  text-align: left;
+  line-height: 1.4;
+  box-shadow: inset 0 0 10px #00ffff;
 }
 
 .desc-container:hover {
@@ -167,24 +166,23 @@ body {
 }
 
 .start-game-button {
-  background-color: var(--secondary-color);
-  color: var(--light-text);
-  width: 18vw;
-  height: 8vh;
-  border: none;
-  border-radius: 12px;
-  font-family: 'Bangers', sans-serif;
-  font-size: var(--font-size-button);
+  background: linear-gradient(135deg, #ff0000, #ffcc00);
+  color: #000;
+  width: 80%;
+  padding: 10px 15px;
+  border: 2px solid #fff;
+  border-radius: 10px;
+  font-family: 'Press Start 2P', cursive;
+  text-transform: uppercase;
+  text-shadow: 0 0 3px #fff;
   cursor: pointer;
-  margin-top: 20px;
   transition: all 0.3s ease;
-  position: relative;
-  z-index: 1;
 }
 
 .start-game-button:hover {
-  background-color: var(--accent-color);
-  box-shadow: 0 4px 30px rgba(255, 99, 71, 0.9);
+  background: linear-gradient(135deg, #00ff00, #00ffff);
+  border-color: #ff00ff;
+  box-shadow: 0 0 10px #00ff00, 0 0 20px #00ffff;
   transform: scale(1.05);
 }
 

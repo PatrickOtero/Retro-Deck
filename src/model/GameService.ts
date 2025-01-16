@@ -20,8 +20,8 @@ export class GameModel {
     this.registerEmulatorService = new RegisterEmulatorService()
   }
 
-  async getGamesList(): Promise<Game[]> {
-    return this.gameListService.getGamesList();
+  async getGamesList(supportedExtensions: string[]): Promise<Game[]> {
+    return this.gameListService.getGamesList(supportedExtensions);
   }
 
   async getEmulatorList(): Promise<Emulator[] | { message: string}[]> {

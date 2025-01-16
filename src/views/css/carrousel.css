@@ -4,6 +4,7 @@
   align-items: center;
   width: 100vw;
   height: 60vh;
+  position: relative;
 }
 
 #prev-button,
@@ -11,54 +12,84 @@
   background-color: transparent;
   border: none;
   cursor: pointer;
-  transition: all 0.1s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  transition: all 0.3s ease-in-out;
   position: absolute;
   top: 50%;
+  transform: translateY(-50%);
   z-index: 9;
+  width: 18vw;  /* Tamanho do botão */
+  height: 18vw; /* Tamanho do botão */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
+/* Ajustando a posição das setas */
 #prev-button {
-  left: 10px;
-  width: 0;
-  height: 0;
-  border-top: 6vw solid transparent;
-  border-bottom: 6vw solid transparent;
-  border-right: 8vw solid #007bff;
+  left: 15px;
 }
 
 #next-button {
-  right: 10px;
-  width: 0;
-  height: 0;
-  border-top: 6vw solid transparent;
-  border-bottom: 6vw solid transparent;
-  border-left: 8vw solid #007bff;
+  right: 15px;
 }
 
-#prev-button:hover {
-  transform: scale(1.05);
-  border-right: 10vw solid #007bff;
+/* Aumentando o tamanho da seta */
+#prev-button img,
+#next-button img {
+  width: 70%;  /* Tamanho da seta */
+  height: 70%; /* Tamanho da seta */
+  transition: all 0.3s ease;
+  filter: drop-shadow(0 0 8px rgba(0, 0, 0, 0.4));
 }
 
+/* Efeito de hover retro */
+#prev-button:hover,
 #next-button:hover {
-  transform: scale(1.05);
-  border-left: 10vw solid #007bff;
+  box-shadow: 0 0 20px 5px rgba(255, 0, 255, 0.8); /* Brilho neon */
+  transform: translateY(-50%) scale(1.1);
+  animation: glow 1s infinite alternate;
+  transform-origin: center center; /* Garantir que a transformação de escala aconteça no centro */
 }
 
-#prev-button:active {
-  transform: scale(1.05);
-  border-right: 10vw solid #fff;
-}
-
-#next-button:active {
-  transform: scale(1.05);
-  border-left: 10vw solid #fff;
-}
-
+/* Efeito de click */
 #prev-button:active,
 #next-button:active {
-  transform: scale(1.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  transform: scale(0.95); /* Redução no clique */
+}
+
+/* Removendo outline quando o botão recebe foco */
+#prev-button:focus,
+#next-button:focus {
+  outline: none;
+}
+
+/* Efeito de brilho nas setas (hover) */
+#prev-button:hover img,
+#next-button:hover img {
+  filter: drop-shadow(0 0 25px rgba(255, 0, 255, 1)); /* Brilho neon */
+  transform: scale(1.2); /* Aumento da seta no hover */
+}
+
+/* Ajuste para evitar desalinhamento da seta direita */
+#prev-button:hover,
+#next-button:hover {
+  /* Ajuste de transformações */
+  transform: scale(1.1) translateY(-50%); 
+}
+
+#prev-button:active img,
+#next-button:active img {
+  transform: scale(1.05); /* Leve aumento ao clicar */
+}
+
+@keyframes glow {
+  0% {
+    box-shadow: 0 0 15px 5px rgba(255, 0, 255, 0.8);
+  }
+  100% {
+    box-shadow: 0 0 25px 10px rgba(255, 0, 255, 1);
+  }
 }

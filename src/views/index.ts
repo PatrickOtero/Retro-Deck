@@ -17,6 +17,9 @@ let isButtonStartPressed = false;
 let lastAxisX = 0;
 let moveCooldown = false; 
 
+let isEmulatorMenuOpen = false;
+let isFirstEmulatorSelected = false;
+
 function detectGamepad(): void {
   const gamepads = navigator.getGamepads();
 
@@ -32,10 +35,14 @@ function detectGamepad(): void {
         isButtonAPressed = false;
       }
 
-      
       if (gamepad.buttons[9].pressed && !isButtonStartPressed) { 
         isButtonStartPressed = true;
-        startGame(); 
+
+        if (isEmulatorMenuOpen && isFirstEmulatorSelected) {
+          closeEmulatorMenu();
+        } else {
+          openEmulatorMenu();
+        }
       } else if (!gamepad.buttons[9].pressed) {
         isButtonStartPressed = false;
       }
@@ -55,6 +62,36 @@ function detectGamepad(): void {
   }
 
   requestAnimationFrame(detectGamepad); 
+}
+
+function openEmulatorMenu(): void {
+  isEmulatorMenuOpen = true;
+
+  emulatorListElement.classList.remove('hidden');
+  emulatorListContainerElement.style.display = 'block';
+  
+  const gameSelector = document.getElementById('game-selector');
+  if (gameSelector && isFirstEmulatorSelected) {
+    gameSelector.style.display = 'none';
+  }
+
+  nextButton.style.display = 'none';
+  prevButton.style.display = 'none';
+}
+
+function closeEmulatorMenu(): void {
+  isEmulatorMenuOpen = false;
+
+  emulatorListElement.classList.add('hidden');
+  emulatorListContainerElement.style.display = 'none';
+  
+  const gameSelector = document.getElementById('game-selector');
+  if (gameSelector) {
+    gameSelector.style.display = 'block';
+  }
+
+  nextButton.style.display = "block";
+  prevButton.style.display = "block";
 }
 
 detectGamepad();
@@ -213,15 +250,19 @@ function selectEmulator(emulator: any): void {
     emulatorListContainerElement.style.display = "none"
   }
 
-  loadGames();
+  loadGames(emulator.romExtensions);
+
+  if (!isFirstEmulatorSelected) {
+    isFirstEmulatorSelected = true;
+  }
 }
 
-async function loadGames(): Promise<void> {
+async function loadGames(supportedExtensions: string[]): Promise<void> {
   try {
     const loadingElement = document.getElementById('loading')!;
     loadingElement.style.opacity = '1';
 
-    games = await window.electronAPI.getGames();
+    games = await window.electronAPI.getGames(supportedExtensions);
 
     if (games.length === 0) {
       displayNoGamesMessage();
@@ -229,11 +270,15 @@ async function loadGames(): Promise<void> {
     }
 
     renderGames();
- 
+
     loadingElement.style.opacity = '0';
     setTimeout(() => {
       loadingElement.style.display = 'none';
-    }, 500); 
+    }, 500);
+
+    if (isFirstEmulatorSelected) {
+      closeEmulatorMenu();
+    }
   } catch (error) {
     console.error('Erro ao carregar jogos:', error);
   }

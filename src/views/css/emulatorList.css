@@ -110,3 +110,8 @@
 .emulator-title:hover {
     background-color: #555; 
 }
+
+.emulator-item.selected {
+    background-color: #4CAF50;
+    transform: scale(1.05);
+  }
