@@ -1,3 +1,5 @@
+
+
 @keyframes pulse {
   0% {
     text-shadow: 0 0 10px #ff0000, 0 0 20px #00ff00, 0 0 30px #0000ff;
@@ -42,43 +44,6 @@ body {
   transform: scale(1.1) rotate(-2deg);
   color: #00ffcc;
   text-shadow: 0 0 15px #00ffcc, 0 0 25px #00ffcc, 0 0 35px rgba(0, 255, 204, 0.9);
-}
-
-.icon-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 80%;
-  margin: 20px auto;
-  position: relative;
-}
-
-.icon {
-  width: 80px;
-  height: 80px;
-  transition: transform 0.5s ease, left 0.5s ease, top 0.5s ease;
-}
-
-.rotated {
-  transform: rotate(360deg);
-}
-
-.icon-container img {
-  position: relative;
-  width: 80px;
-  height: auto;
-  animation: float 1.5s infinite ease-in-out;
-
-  top: 5%;
-}
-
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
 }
 
 .game-info-container {
@@ -207,4 +172,72 @@ body {
 
 .desc-container::-webkit-scrollbar-thumb:hover {
   background-color: #888;
+}
+
+@media (min-width: 768px) {
+  .game-info-container {
+    width: 350px;
+    height: 500px;
+  }
+  .game-image-container {
+    height: 200px;
+  }
+  .desc-container {
+    font-size: 1rem;
+    height: 120px;
+  }
+  .start-game-button {
+    width: 85%;
+    padding: 12px 20px;
+  }
+}
+
+@media (max-width: 800px) {
+  .game-info-container {
+    width: 240px;
+    height: 350px;
+  }
+}
+
+@media (min-width: 800px) and (max-width: 1024px) {
+  .game-info-container {
+    width: 280px;
+    height: 420px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .game-info-container {
+    width: 350px;
+    height: 500px;
+  }
+  .game-image-container {
+    height: 250px;
+  }
+  .desc-container {
+    font-size: 1.1rem;
+    height: 140px;
+  }
+  .start-game-button {
+    width: 90%;
+    padding: 15px 25px;
+  }
+}
+
+@media (min-width: 1440px) {
+  .game-info-container {
+    width: 450px;
+    height: 600px;
+  }
+  .game-image-container {
+    height: 300px;
+  }
+  .desc-container {
+    font-size: 1.2rem;
+    height: 160px;
+  }
+  .start-game-button {
+    width: 95%;
+    padding: 18px 30px;
+  }
 }

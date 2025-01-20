@@ -14,7 +14,7 @@
   },
   "include": [
     "src/**/*"                                 // Incluir todos os arquivos na pasta src
-  ],
+, "copyStatic.js"  ],
   "exclude": [
     "node_modules"                             // Excluir a pasta node_modules da compilação
   ]

@@ -1,10 +1,19 @@
 {
   "devDependencies": {
+    "@electron-forge/cli": "^7.6.0",
+    "@electron-forge/maker-deb": "^7.6.0",
+    "@electron-forge/maker-rpm": "^7.6.0",
+    "@electron-forge/maker-squirrel": "^7.6.0",
+    "@electron-forge/maker-zip": "^7.6.0",
+    "@electron-forge/plugin-auto-unpack-natives": "^7.6.0",
+    "@electron-forge/plugin-fuses": "^7.6.0",
+    "@electron/fuses": "^1.8.0",
     "@types/electron": "^1.4.38",
     "@types/knex": "^0.15.2",
     "@types/node": "^22.10.5",
     "css-loader": "^7.1.2",
     "electron": "^33.3.1",
+    "electron-builder": "^25.1.8",
     "ncp": "^2.0.0",
     "style-loader": "^4.0.0",
     "ts-loader": "^9.5.2",
@@ -13,7 +22,7 @@
     "webpack-cli": "^6.0.1",
     "webpack-dev-server": "^5.2.0"
   },
-  "name": "Emulator-game-elector",
+  "name": "retro-portal",
   "version": "1.0.0",
   "main": "dist/main.js",
   "dependencies": {
@@ -30,6 +39,8 @@
     "define-properties": "^1.2.1",
     "detect-node": "^2.1.0",
     "dotenv": "^16.4.7",
+    "electron-log": "^5.2.4",
+    "electron-squirrel-startup": "^1.0.1",
     "end-of-stream": "^1.4.4",
     "env-paths": "^2.2.1",
     "es-define-property": "^1.0.1",
@@ -82,9 +93,35 @@
     "yauzl": "^2.10.0"
   },
   "scripts": {
-    "start": "electron .",
+    "start": "electron-forge start",
+    "dev": "electron .",
     "build": "tsc && npm run copy-static",
-    "copy-static": "ncp ./src/views ./dist/views"
+    "copy-static": "ncp ./src/views ./dist/views",
+    "package": "electron-forge package",
+    "make": "electron-forge make",
+    "clean": "electron-forge clean",
+    "builder:build": "electron-builder --win"
+  },
+  "build": {
+    "appId": "com.retroportal.id",
+    "productName": "Retro Portal",
+    "win": {
+      "target": [
+        "nsis",
+        "zip"
+      ],
+      "icon": "./assets/RetroPortalIcon.ico"
+    },
+    "files": [
+      "**/*"
+    ],
+    "directories": {
+      "output": "out"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
   },
   "keywords": [],
   "author": "Patrick da Rocha Otero",

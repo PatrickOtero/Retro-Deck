@@ -7,7 +7,13 @@ export class RegisterEmulatorService {
   private emulatorPath: string;
 
   constructor() {
-    this.emulatorPath = path.join(app.getAppPath(), 'emulators');
+    this.emulatorPath = app.isPackaged
+    ? path.join(process.resourcesPath, 'emulators')
+    : path.join(app.getAppPath(), 'emulators');
+  }
+
+  private checkEmulatorDirectoryExists(): boolean {
+    return fs.existsSync(this.emulatorPath);
   }
 
   async filterValidExecutables(files: string[]): Promise<string[]> {
@@ -20,6 +26,10 @@ export class RegisterEmulatorService {
   }
 
   async registerEmulator(): Promise<{ message: string }[]> {
+    if (!this.checkEmulatorDirectoryExists()) {
+      return [{ message: 'A pasta "emulators" não existe. Nenhum emulador pode ser registrado.' }];
+    }
+
     const files = fs.readdirSync(this.emulatorPath).filter(file =>
       file.endsWith('.exe')
     );

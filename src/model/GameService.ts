@@ -5,8 +5,10 @@ import { Emulator, Game } from '../interfaces/interfaces';
 import { EmulatorListService } from './getEmulatorListService';
 import { RegisterEmulatorService } from './registerEmulatorDataService';
 import { SearchOnRawgAndSaveOnDb } from './searchOnRawgAndSaveOnDb';
+import log from "electron-log"
 
 export class GameModel {
+  private basePath: string;
   private romsPath: string;
   private emulatorPath: string;
   private gameListService: GameListService;
@@ -15,8 +17,14 @@ export class GameModel {
   private searchOnRawgAndSaveOnDb: SearchOnRawgAndSaveOnDb;
 
   constructor() {
-    this.romsPath = path.join(app.getAppPath(), 'roms');
-    this.emulatorPath = path.join(app.getAppPath(), 'emulators');
+    this.basePath = app.isPackaged ? process.resourcesPath : app.getAppPath();
+    this.romsPath = app.isPackaged 
+    ? path.join(process.resourcesPath, 'roms') 
+    : path.join(app.getAppPath(), 'resources', 'roms');
+  
+  this.emulatorPath = app.isPackaged 
+    ? path.join(process.resourcesPath, 'emulators') 
+    : path.join(app.getAppPath(), 'resources', 'emulators');
     this.gameListService = new GameListService();
     this.emulatorListService = new EmulatorListService()
     this.registerEmulatorService = new RegisterEmulatorService()
@@ -40,10 +48,16 @@ export class GameModel {
   }
 
   getGamePath(gameName: string): string {
-    return path.join(this.romsPath, gameName);
+    const basePath = app.isPackaged ? process.resourcesPath : app.getAppPath();
+    const gamePath = path.join(basePath, 'roms', gameName);
+    log.info(`Gerado caminho do jogo: ${gamePath}`);
+    return gamePath;
   }
-
+  
   getEmulatorPath(emulatorName: string): string {
-    return path.join(this.emulatorPath, emulatorName);
+    const basePath = app.isPackaged ? process.resourcesPath : app.getAppPath();
+    const emulatorPath = path.join(basePath, 'emulators', emulatorName);
+    log.info(`Gerado caminho do emulador: ${emulatorPath}`);
+    return emulatorPath;
   }
 }

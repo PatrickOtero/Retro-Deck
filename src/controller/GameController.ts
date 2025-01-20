@@ -4,6 +4,7 @@ import { GameModel } from '../model/GameService';
 import * as fs from 'fs';
 import { BrowserWindow } from 'electron';
 import { Emulator, Game } from '../interfaces/interfaces';
+import log from 'electron-log';
 
 export class GameController {
   private gameModel: GameModel;
@@ -54,21 +55,21 @@ export class GameController {
     });
 
     ipcMain.handle('run-game', async (event, gameName: string, emulatorName: string) => {
-      console.log("Run game executado!")
+      log.info(`Run game executado! Jogo: ${gameName}, Emulador: ${emulatorName}`);
       if (!emulatorName) {
-        console.error('Erro: Nome do emulador está indefinido.');
+        log.error('Erro: Nome do emulador está indefinido.');
         return { success: false, message: 'Nome do emulador está indefinido.' };
       }
     
       const gamePath = this.gameModel.getGamePath(gameName);
-    
+      log.info(`Caminho do jogo: ${gamePath}`);
       if (!gamePath) {
-        console.error('Erro: Caminho do jogo não encontrado.');
+        log.error('Erro: Caminho do jogo não encontrado.');
         return { success: false, message: 'Caminho do jogo não encontrado.' };
       }
     
       if (this.isEmulatorRunning) {
-        console.log('O emulador já está em execução.');
+        log.warn('O emulador já está em execução.');
         return { success: false, message: 'O emulador já está rodando.' };
       }
     
@@ -83,25 +84,23 @@ export class GameController {
 
   private runGame(gameName: string, emulatorName: string): void {
     const gamePath = this.gameModel.getGamePath(gameName);
-    const emulatorPath = `C:\\Users\\Patrick Otero\\Desktop\\Entertainment\\Consoles emulation\\My programs\\Retro-Deck\\emulators\\${emulatorName}.exe`;
+    const emulatorPath = this.gameModel.getEmulatorPath(emulatorName + ".exe");
   
-    if (!gamePath || !emulatorName) {
-      console.error('Erro: Caminho do jogo ou nome do emulador está indefinido.');
+    log.info(`Tentando iniciar o emulador: ${emulatorPath} com o jogo: ${gamePath}`);
+  
+    if (!gamePath || !fs.existsSync(gamePath)) {
+      log.error(`Erro: Caminho do jogo não encontrado: ${gamePath}`);
       return;
     }
   
-    if (!fs.existsSync(gamePath)) {
-      console.error(`Erro: Caminho do jogo não encontrado: ${gamePath}`);
-      return;
-    }
-  
-    if (!fs.existsSync(emulatorPath)) {
-      console.error(`Erro: Caminho do emulador não encontrado: ${emulatorPath}`);
+    if (!emulatorPath || !fs.existsSync(emulatorPath)) {
+      log.error(`Erro: Caminho do emulador não encontrado: ${emulatorPath}`);
       return;
     }
   
     const mainWindow = BrowserWindow.getFocusedWindow();
     if (mainWindow) {
+      log.info('Ocultando janela principal antes de iniciar o emulador.');
       mainWindow.hide();
     }
   
@@ -109,26 +108,24 @@ export class GameController {
   
     const childProcess = exec(`"${emulatorPath}" "${gamePath}"`, (err, stdout, stderr) => {
       if (err) {
-        console.error(`Erro ao rodar o ${emulatorName}: ${err}`);
+        log.error(`Erro ao executar o emulador: ${err.message}`);
         this.isEmulatorRunning = false;
         return;
       }
+      log.info(`Saída do emulador: ${stdout}`);
       if (stderr) {
-        console.error(`Erro no ${emulatorName}: ${stderr}`);
-        this.isEmulatorRunning = false;
-        return;
+        log.warn(`Aviso do emulador: ${stderr}`);
       }
-      console.log(`Saída do ${emulatorName}: ${stdout}`);
     });
   
     childProcess.on('close', (code) => {
-      console.log(`O emulador foi fechado com o código: ${code}`);
+      log.info(`O emulador foi encerrado com o código: ${code}`);
       this.isEmulatorRunning = false;
   
       if (mainWindow) {
+        log.info('Restaurando a janela principal após o encerramento do emulador.');
         mainWindow.show();
       }
     });
   }
-  
 }

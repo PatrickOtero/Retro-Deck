@@ -7,6 +7,10 @@
   position: relative;
 }
 
+button {
+  z-index: 2;
+}
+
 #prev-button,
 #next-button {
   background-color: transparent;
@@ -64,6 +68,24 @@
 #prev-button:active img,
 #next-button:active img {
   transform: scale(1.05);
+}
+
+#prev-button.selected,
+#next-button.selected {
+  animation: glow 1s infinite alternate;
+  transform-origin: center center;
+  filter: drop-shadow(0 0 25px rgba(255, 0, 255, 1));
+}
+
+#prev-button.selected img,
+#next-button.selected img {
+  filter: drop-shadow(0 0 25px rgba(255, 0, 255, 1));
+}
+
+#prev-button.selected:active,
+#next-button.selected:active {
+  transform: scale(0.75);
+  filter: drop-shadow(0 0 25px rgb(218, 182, 218));
 }
 
 @keyframes glow {

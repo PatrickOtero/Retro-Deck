@@ -6,6 +6,10 @@ const nextButton = document.getElementById('next-button') as HTMLElement;
 const toggleButton = document.getElementById('toggle-button');
 const closeButton = document.getElementById('close-button') as HTMLElement;
 const loadingElement = document.getElementById('loading')!;
+const reloadButton = document.querySelector(".no-content-button") as HTMLElement;
+const emulatorsButton = document.getElementById('emulators-button') as HTMLElement;
+const exitButton = document.getElementById('exit-button') as HTMLElement;
+
 
 let selectedEmulator: any = null;
 
@@ -19,10 +23,107 @@ let lastAxisX = 0;
 let lastAxisY = 0;
 let moveCooldown = false; 
 
-let isEmulatorMenuOpen = true;
+let isCarrouselOpen = false
+let isEmulatorMenuOpen = false;
 let isFirstEmulatorSelected = false;
 
 let emulatorIndex = 0;
+let buttonsIndex = 0
+
+let mainMenuOpen = true
+
+console.log("carroussel open: " + isCarrouselOpen +  " " + "emulator list: " + isEmulatorMenuOpen + " " + "main menu open: " + mainMenuOpen)
+
+const buttons = [emulatorsButton, exitButton, reloadButton];
+
+function highlightButton(index: number) {
+  buttons.forEach((button, i) => {
+    button.classList.toggle('selected', i === index);
+  });
+}
+
+function mainMenuLoader() {
+  console.log("carroussel open: " + isCarrouselOpen +  " " + "emulator list: " + isEmulatorMenuOpen + " " + "main menu open: " + mainMenuOpen)
+
+  mainMenuOpen = true
+
+  const emulatorsButton = document.getElementById('emulators-button') as HTMLElement;
+  const exitButton = document.getElementById('exit-button') as HTMLElement;
+  const mainMenu = document.getElementById('main-menu') as HTMLElement;
+  const emulatorListContainer = document.getElementById('emulator-list-container') as HTMLElement;
+  const gameSelector = document.getElementById('game-selector') as HTMLElement
+
+  mainMenu.classList.add("visible")
+  emulatorListContainer.style.display = "none";
+  gameSelector.style.display = "none"
+
+  emulatorsButton.addEventListener('click', async () => {
+    mainMenuOpen = false
+    isEmulatorMenuOpen = true
+    loadEmulators();
+    mainMenu.style.display = "none"
+    emulatorListContainer.style.display = "block"
+  });
+
+  exitButton.addEventListener('click', () => {
+    window.close();
+  });
+}
+
+function noContentWarning(): void {
+  const emulatorList = document.querySelector("#emulator-list-container") as HTMLElement;
+
+  nextButton.style.display = "none"
+  prevButton.style.display = "none"
+
+  const appTitle = document.querySelector(".select-game-title") as HTMLElement
+
+  const noContentButton = document.createElement("button")
+  noContentButton.classList.add("no-content-button")
+  noContentButton.innerHTML = "Reload"
+
+  appTitle.style.display = "none"
+
+  if (!emulatorList) {
+    console.error("Emulator list container not found!");
+    return;
+  }
+  
+  const noContentContainer = document.createElement("div");
+  noContentContainer.classList.add("no-content-container");
+
+  const noContentTitle = document.createElement("h1");
+  noContentTitle.innerHTML = "No Content!";
+  noContentTitle.classList.add("no-content-title");
+
+  const noContentInfo = document.createElement("p");
+  noContentInfo.innerHTML = `
+    The program hasn't found any content. <br><br>
+    Please create the following folders:<br>
+    <strong>'emulators'</strong> for emulator executables<br>
+    <strong>'roms'</strong> for respective ROM files<br><br>
+    Both should be located inside the <strong>'resources'</strong> folder in the installation directory. After following the instructions, press <strong>'Reload'</strong>
+  `;
+  noContentInfo.classList.add("no-content-info");
+
+  noContentContainer.appendChild(noContentTitle);
+  noContentContainer.appendChild(noContentInfo);
+  noContentContainer.appendChild(noContentButton)
+  
+  emulatorList.appendChild(noContentContainer);
+
+  noContentButton.addEventListener("click", async () => {
+    if (!emulators.length) {
+      noContentContainer.style.display = "none"
+
+      showLoading()
+      loadEmulators()
+      hideLoading()
+    } else {
+      return
+    }
+  })
+}
 
 function highlightEmulator(index: number): void {
   const emulatorTitles = document.querySelectorAll<HTMLHeadingElement>('.emulator-title');
@@ -34,6 +135,68 @@ function highlightEmulator(index: number): void {
 
 highlightEmulator(emulatorIndex);
 
+window.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && !mainMenuOpen) {
+    if (isFirstEmulatorSelected) {
+      if (isEmulatorMenuOpen) {
+        closeEmulatorMenu();
+      } else {
+        openEmulatorMenu();
+      }
+    }
+    return;
+  }
+
+  const emulatorTitles = document.querySelectorAll<HTMLHeadingElement>('.emulator-title');
+  const prevButton = document.getElementById('prev-button') as HTMLElement;
+  const nextButton = document.getElementById('next-button') as HTMLElement;
+
+  if (mainMenuOpen) {
+    const numButtons = buttons.length;
+    if (event.key === 'ArrowUp' || event.key === 'w') {
+      currentIndex = (currentIndex - 1 + numButtons) % numButtons;
+      highlightButton(currentIndex);
+    } else if (event.key === 'ArrowDown' || event.key === 's') {
+      currentIndex = (currentIndex + 1) % numButtons;
+      highlightButton(currentIndex);
+    } else if (event.key === 'Enter') {
+      buttons[currentIndex].click();
+    }
+    return;
+  }
+
+  if (isEmulatorMenuOpen) {
+    if (event.key === 'ArrowUp' || event.key.toLowerCase() === 'w') {
+      emulatorIndex = (emulatorIndex - 1 + emulatorTitles.length) % emulatorTitles.length;
+      highlightEmulator(emulatorIndex);
+    } else if (event.key === 'ArrowDown' || event.key.toLowerCase() === 's') {
+      emulatorIndex = (emulatorIndex + 1) % emulatorTitles.length;
+      highlightEmulator(emulatorIndex);
+    } else if (event.key === 'Enter') {
+      selectEmulator(emulators[emulatorIndex]);
+    }
+    return;
+  }
+
+  if (isCarrouselOpen) {
+    if (event.key === 'ArrowRight' || event.key.toLowerCase() === 'd') {
+      if (nextButton) {
+        nextButton.classList.add('selected');
+        prevButton?.classList.remove('selected');
+        moveToNextGame();
+      }
+    } else if (event.key === 'ArrowLeft' || event.key.toLowerCase() === 'a') {
+      if (prevButton) {
+        prevButton.classList.add('selected');
+        nextButton?.classList.remove('selected');
+        moveToPrevGame();
+      }
+    } else if (event.key === 'Enter') {
+      startGame();
+    }
+  }
+});
+
 function detectGamepad(): void {
   const gamepads = navigator.getGamepads();
 
@@ -41,6 +204,24 @@ function detectGamepad(): void {
     const gamepad = gamepads[0]; 
 
     if (gamepad) {
+
+      if (mainMenuOpen) {
+      const axisY = gamepad.axes[1];
+
+      if (Math.abs(axisY) > 0.2) {
+        if (axisY < -0.2) {
+          currentIndex = (currentIndex - 1 + buttons.length) % buttons.length;
+          highlightButton(currentIndex);
+        } else if (axisY > 0.2) {
+          currentIndex = (currentIndex + 1) % buttons.length;
+          highlightButton(currentIndex);
+        }
+      }
+
+      if (gamepad.buttons[0].pressed) {
+        buttons[currentIndex].click();
+      }
+    }
       
       if ( !isEmulatorMenuOpen ) {
       if (gamepad.buttons[0].pressed && !isButtonAPressed) { 
@@ -50,28 +231,40 @@ function detectGamepad(): void {
         isButtonAPressed = false;
       }
 
-      if (gamepad.buttons[9].pressed && !isButtonStartPressed) { 
-        isButtonStartPressed = true;
-
-        if (isFirstEmulatorSelected) {
-        if (isEmulatorMenuOpen) {
-          closeEmulatorMenu();
-        } else {
-          openEmulatorMenu();
-        }
-      }
-      } else if (!gamepad.buttons[9].pressed) {
-        isButtonStartPressed = false;
-      }
-
       const axisX = gamepad.axes[0];
 
       if (Math.abs(axisX) > 0.2 && !moveCooldown) { 
-        axisX > 0 ? moveToNextGame() : moveToPrevGame();
+        if (axisX > 0) {
+          nextButton.classList.add('selected');
+          prevButton.classList.remove('selected');
+    
+          moveToNextGame();
+        } else {
+          prevButton.classList.add('selected');
+          nextButton.classList.remove('selected');
+    
+          moveToPrevGame();
+        }
+
         lastAxisX = axisX;
         moveCooldown = true; 
         setTimeout(() => { moveCooldown = false; }, 300); 
       }
+    }
+
+    if (gamepad.buttons[9].pressed && !isButtonStartPressed) { 
+      isButtonStartPressed = true;
+
+      if (isFirstEmulatorSelected) {
+      if (isEmulatorMenuOpen) {
+        closeEmulatorMenu();
+      } else {
+        openEmulatorMenu();
+      }
+    }
+    
+    } else if (!gamepad.buttons[9].pressed) {
+      isButtonStartPressed = false;
     }
 
       if (isEmulatorMenuOpen) {
@@ -108,6 +301,9 @@ function detectGamepad(): void {
 detectGamepad();
 
 function openEmulatorMenu(): void {
+  isEmulatorMenuOpen = true;
+  isCarrouselOpen = false
+
   emulatorListElement.classList.remove('hidden');
   emulatorListContainerElement.style.display = 'block';
 
@@ -128,6 +324,7 @@ function openEmulatorMenu(): void {
 
 function closeEmulatorMenu(): void {
   isEmulatorMenuOpen = false;
+  isCarrouselOpen = true
 
   emulatorListElement.classList.add('hidden');
   emulatorListContainerElement.style.display = 'none';
@@ -139,12 +336,13 @@ function closeEmulatorMenu(): void {
 
   nextButton.style.display = "block";
   prevButton.style.display = "block";
+
 }
 
 function generateStars(): void {
   const starCount = Math.floor(window.innerWidth * window.innerHeight / 10000); 
   const background = document.getElementById('background') as HTMLElement;
-  const sizeRange = [1.5, 5]; 
+  const sizeRange = [1.5, 5];
 
   background.innerHTML = '';
 
@@ -212,6 +410,7 @@ function applyRandomRotation() {
 }
 
 window.onload = () => {
+  mainMenuLoader()
   arrangeIconsRandomly();
   applyRandomRotation();
   generateStars()
@@ -221,54 +420,6 @@ window.addEventListener('resize', () => {
   arrangeIconsRandomly();
   applyRandomRotation();
   generateStars();
-  renderGames();
-});
-
-window.addEventListener('keydown', (event) => {
-  if (event.key === 'Escape') {
-    if (isFirstEmulatorSelected) {
-    if (isEmulatorMenuOpen) {
-      closeEmulatorMenu();
-    } else {
-      openEmulatorMenu();
-    }
-  }
-  }
-
-  const emulatorTitles = document.querySelectorAll<HTMLHeadingElement>('.emulator-title');
-
-  if (emulatorTitles.length === 0 || !isEmulatorMenuOpen) return;
-
-  switch (event.key.toLowerCase()) {
-    case 'arrowup':
-    case 'w':
-      emulatorIndex = (emulatorIndex - 1 + emulatorTitles.length) % emulatorTitles.length;
-      highlightEmulator(emulatorIndex);
-      break;
-
-    case 'arrowdown':
-    case 's':
-      emulatorIndex = (emulatorIndex + 1) % emulatorTitles.length;
-      highlightEmulator(emulatorIndex);
-      break;
-
-    case 'arrowright':
-    case 'd':
-      moveToNextGame();
-      break;
-
-    case 'arrowleft':
-    case 'a':
-      moveToPrevGame();
-      break;
-
-    case 'enter':
-      selectEmulator(emulators[emulatorIndex]);
-      if (document.activeElement?.classList.contains('game-info-container')) {
-        startGame();
-      }
-      break;
-    }
 });
 
 function showLoading(): void {
@@ -284,30 +435,56 @@ function hideLoading(): void {
   }, 500);
 }
 
+function goBackToMenu() {
+  console.log("carroussel open: " + isCarrouselOpen +  " " + "emulator list: " + isEmulatorMenuOpen + " " + "main menu open: " + mainMenuOpen)
+
+  isCarrouselOpen = false
+  isEmulatorMenuOpen = false
+  mainMenuOpen = true
+
+  const mainMenu = document.getElementById('main-menu') as HTMLElement;
+  const emulatorListContainer = document.getElementById('emulator-list-container') as HTMLElement;
+
+    emulatorListContainer.style.display = 'none';
+    mainMenu.style.display = "block"
+}
+
 async function loadEmulators(): Promise<void> {
-  try {
+  console.log("carroussel open: " + isCarrouselOpen +  " " + "emulator list: " + isEmulatorMenuOpen + " " + "main menu open: " + mainMenuOpen)
+
+  isEmulatorMenuOpen = true
+  isCarrouselOpen = false
+
     showLoading();
 
     if (emulators.length === 0) {
-      await window.electronAPI.registerEmulator();
+      const emulatorList = await window.electronAPI.registerEmulator();
+      hideLoading()
+
+      if (emulatorList.length === 1 && emulatorList[0].message.includes("não existe")) {
+        noContentWarning();
+        return;
+      }
     }
+    
+    const carrouselTitle = document.querySelector(".select-game-title") as HTMLElement;
+
+    carrouselTitle.style.display = "none"
+
+    prevButton.style.display = "none"
+    nextButton.style.display = "none"
 
     emulators = await window.electronAPI.getEmulator();
-    nextButton.style.display = "none";
-    prevButton.style.display = "none";
 
     renderEmulators();
 
     hideLoading();
-  } catch (error) {
-    console.error('Erro ao carregar emuladores:', error);
-    hideLoading();
-  }
 }
 
 function renderEmulators(): void {
   if (emulators.length === 0) {
     console.log('Nenhum emulador encontrado.');
+    noContentWarning();
     return;
   }
 
@@ -321,6 +498,16 @@ function renderEmulators(): void {
 function createEmulatorContainer(emulators: any): HTMLElement {
   const container = document.createElement('div');
   container.classList.add('game-list-item-container');
+  const emulatorList = document.querySelector("#emulator-list-container") as HTMLElement;
+
+  if (!document.getElementById('back-button')) {
+    const backButton = document.createElement('button');
+    backButton.id = 'back-button';
+    backButton.classList.add('menu-button');
+    backButton.textContent = 'Back';
+    backButton.onclick = () => goBackToMenu();
+    emulatorList.appendChild(backButton);
+  }
 
   for (let emulator of emulators) {
     const emulatorTitle = document.createElement('h3');
@@ -361,8 +548,15 @@ function selectEmulator(emulator: any): void {
 }
 
 async function loadGames(supportedExtensions: string[]): Promise<void> {
+  console.log("carroussel open: " + isCarrouselOpen +  " " + "emulator list: " + isEmulatorMenuOpen + " " + "main menu open: " + mainMenuOpen)
+
+  isCarrouselOpen = true
   try {
     showLoading();
+
+    const carrouselTitle = document.querySelector(".select-game-title") as HTMLElement;
+
+    carrouselTitle.style.display = "block"
 
     if (games.length === 0) {
       await window.electronAPI.searchAndSaveGames(supportedExtensions)
@@ -488,5 +682,3 @@ function moveToPrevGame(): void {
 
 prevButton.addEventListener('click', moveToPrevGame);
 nextButton.addEventListener('click', moveToNextGame);
-
-loadEmulators();

@@ -7,7 +7,9 @@ export class SearchOnRawgAndSaveOnDb {
   private romsPath: string;
 
   constructor() {
-    this.romsPath = path.join(app.getAppPath(), 'roms');
+    this.romsPath = app.isPackaged
+      ? path.join(process.resourcesPath, 'roms')
+      : path.join(app.getAppPath(), 'roms');
   }
 
   async searchOnRawgAndSaveOnDb(
