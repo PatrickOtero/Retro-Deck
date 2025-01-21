@@ -17,30 +17,26 @@
     backdrop-filter: blur(10px);
 }
 
-#emulator-list-container:before {
-    content: '';
-    position: absolute;
-    top: -6px;
-    left: -6px;
-    right: -6px;
-    bottom: -6px;
-    background: linear-gradient(45deg, #333, #444, #333);
-    border-radius: 18px;
-    z-index: -1;
-    box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
-}
-
 .emulators-list {
-    max-height: 60vh;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding-right: 15px;
-    padding-left: 15px;
+  display: flex;
+
+  justify-content: center;
+  align-items: center;
+
+  padding: 18px;
+  margin-bottom: 12px;
+  background-color: rgba(40, 40, 40, 0.9);
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.emulator-item {
+.emulators-list:hover {
+  transform: scale(1.03);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+}
+
+.emulator-menu-button {
     padding: 18px;
     font-size: 18px;
     font-family: 'Press Start 2P', cursive;
@@ -60,11 +56,23 @@
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
 }
 
-.emulator-item:hover {
+.emulator-menu-button:hover {
     background-color: #444;
     transform: translateY(-5px);
     box-shadow: 0 0 25px rgba(255, 255, 255, 0.5);
     text-shadow: 0 0 6px rgba(255, 255, 255, 0.6);
+}
+
+.emulator-menu-button.selected {
+  background-color: #4CAF50;
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(76, 175, 80, 0.5);
+  transition: all 0.2s ease;
+}
+
+.emulator-menu-button.selected:hover {
+  background-color: #45a049;
+  box-shadow: 0 0 25px rgba(76, 175, 80, 0.7);
 }
 
 .emulators-list::-webkit-scrollbar {
@@ -86,35 +94,7 @@
     background-color: #aaa;
 }
 
-.game-list-item-container {
-    position: relative;
-    padding: 18px;
-    margin-bottom: 12px;
-    background-color: rgba(40, 40, 40, 0.9);
-    border-radius: 10px;
-    box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.game-list-item-container:hover {
-    transform: scale(1.03);
-    box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
-}
-
-.game-list-item-container:before {
-    content: '';
-    position: absolute;
-    background: linear-gradient(45deg, #666, #444, #666);
-    border-radius: 10px;
-    z-index: -1;
-    filter: blur(4px);
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-}
-
-.emulator-title {
+#emulator-list-item {
     background-color: #444;
     color: #f0f0f0;
     margin: 8px 0;
@@ -127,7 +107,7 @@
     transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
 }
 
-.emulator-title.selected {
+#emulator-list-item.selected {
     background-color: #333;
     color: #fff;
     padding: 10px 15px;
@@ -138,28 +118,15 @@
     text-shadow: 0 0 8px rgba(76, 175, 80, 0.8);
 }
 
-.emulator-title:hover {
+#emulator-list-item:hover {
     background-color: #555;
     transform: translateY(-3px);
 }
 
-.emulator-title.selected:hover {
+#emulator-list-item.selected:hover {
     background-color: #333;
     box-shadow: 0 0 10px rgba(76, 175, 80, 0.6), 0 0 20px rgba(76, 175, 80, 0.8);
 }
-
-.emulator-item.selected {
-    background-color: #4CAF50;
-    transform: scale(1.05);
-    box-shadow: 0 0 15px rgba(76, 175, 80, 0.5);
-    transition: all 0.2s ease;
-}
-
-.emulator-item.selected:hover {
-    background-color: #45a049;
-    box-shadow: 0 0 25px rgba(76, 175, 80, 0.7);
-}
-
 
 .no-content-container {
     display: flex;
@@ -241,30 +208,5 @@
   .no-content-button:active {
     transform: scale(0.95);
     box-shadow: inset 0 0 20px rgba(0, 255, 0, 0.8);
-  }
-
-  #back-button {
-    font-family: 'Press Start 2P', cursive;
-    font-size: 18px;
-    background-color: #555;
-    color: #fff;
-    border: 2px solid #888;
-    border-radius: 12px;
-    padding: 12px;
-    cursor: pointer;
-    width: 100%;
-    text-align: center;
-    margin-top: 20px;
-    transition: background-color 0.3s ease, transform 0.3s ease;
-  }
-  
-  #back-button:hover {
-    background-color: #444;
-    transform: translateY(-3px);
-  }
-  
-  #back-button:active {
-    background-color: #333;
-    transform: translateY(1px);
   }
   

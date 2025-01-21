@@ -1,10 +1,12 @@
 {
   "compilerOptions": {
-    "target": "ES2020",                        // O código será compilado para ES2020
-    "module": "CommonJS",                      // Usamos CommonJS para compatibilidade com Node
-    "strict": true,                            // Ativa todas as verificações de tipo do TypeScript
+    "target": "ES2024",                        // O código será compilado para ES2020
+    "module": "CommonJS",                        // Usamos CommonJS para compatibilidade com Node
+    "strict": true,      
+    "moduleResolution": "node",                      // Ativa todas as verificações de tipo do TypeScript
     "esModuleInterop": true,                   // Habilita a importação de módulos CommonJS como ES6
-    "skipLibCheck": true,                      // Ignora a verificação de tipos em bibliotecas externas
+    "skipLibCheck": true,
+    "resolveJsonModule": true,                 // Ignora a verificação de tipos em bibliotecas externas
     "forceConsistentCasingInFileNames": true,  // Garante que os nomes de arquivos sejam consistentes em termos de maiúsculas/minúsculas
     "outDir": "./dist",                        // Pasta de saída para os arquivos JavaScript compilados
     "baseUrl": ".",                            // Base para caminhos relativos
