@@ -1,25 +1,15 @@
 :root {
-  --primary-color: #00bfff; 
-  --secondary-color: #ff6347; 
-  --accent-color: #ff7043; 
-  --dark-background: #222; 
-  --light-text: #fff; 
-  --highlight-text: #ffeb3b; 
-  --loading-background: rgba(0, 0, 0, 0.8); 
-  
-  --font-size-h1: 4vw;
-  --font-size-game-name: 2vw;
-  --font-size-button: 18px;
-  --font-size-desc: 14px;
-   
-  --box-shadow-normal: 0 10px 30px rgba(0, 0, 0, 0.6);
-  --box-shadow-hover: 0 20px 60px rgba(0, 0, 0, 0.7);
-  --text-shadow-h1: 3px 3px 12px rgba(0, 191, 255, 0.8), 0 0 30px rgba(0, 191, 255, 0.6);
-  --text-shadow-game-name: 3px 3px 18px rgba(255, 255, 0, 0.7);
-  --text-shadow-hover: 3px 3px 18px rgba(255, 99, 71, 0.9);
-   
-  --border-radius: 20px;
-  --border-radius-hover: 30px;
-  
-  --transition-speed: 0.5s;
+  --primary-bg: #000;
+  --accent-color: #ff00ff;
+  --highlight-color: #ffcc00;
+  --light-text: #fff;
+  --dark-text: #ccc;
+  --shadow-color: rgba(0, 0, 255, 0.5);
+  --button-bg: linear-gradient(135deg, #ff0000, #ffcc00);
+  --button-hover-bg: linear-gradient(135deg, #00ff00, #00ffff);
+  --border-radius: 16px;
+  --button-border-radius: 10px;
+  --button-padding: 10px 15px;
+  --transition-speed: 0.3s;
+  --font-family: 'Press Start 2P', cursive;
 }

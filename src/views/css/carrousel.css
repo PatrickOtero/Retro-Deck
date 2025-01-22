@@ -16,9 +16,8 @@ button {
   background-color: transparent;
   border: none;
   cursor: pointer;
-  transition: all 0.3s ease-in-out;
   position: absolute;
-  top: 30%;
+  top: 50%;
   z-index: 9;
   width: 18vw;
   height: 18vw;
@@ -38,15 +37,16 @@ button {
 
 #prev-button img,
 #next-button img {
-  width: 70%;  
-  height: 70%; 
-  transition: all 0.3s ease;
+  width: 70%;
+  height: 70%;
+  transition: all var(--transition-speed) ease;
 }
 
 #prev-button:hover,
 #next-button:hover {
   animation: glow 1s infinite alternate;
   transform-origin: center center;
+  filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.7));
 }
 
 #prev-button:active,

@@ -90,8 +90,6 @@ function highlightButton(index: number) {
 }
 
 function mainMenuLoader() {
-  console.log("carroussel open: " + isCarrouselOpen +  " " + "emulator list: " + isEmulatorMenuOpen + " " + "main menu open: " + mainMenuOpen)
-
   setMenuState(true, false, false)
 
   const emulatorsButton = document.getElementById('emulators-button') as HTMLElement;
@@ -496,6 +494,19 @@ window.addEventListener('resize', () => {
 });
 
 function showLoading(): void {
+  const loadText = document.createElement("p")
+  loadText.classList.add("load-text")
+ 
+  loadingElement.innerHTML = ""
+  
+  if (!mainMenuOpen && isEmulatorMenuOpen && !isCarrouselOpen) {
+    loadText.textContent = "Searching emulators"
+  } else if (!mainMenuOpen && !isEmulatorMenuOpen && isCarrouselOpen) {
+    loadText.textContent = "Searching Games"
+  }
+  
+  loadingElement.appendChild(loadText)
+
   loadingElement.style.display = 'flex';
   loadingElement.style.opacity = '1';
   loadingElement.style.pointerEvents = 'auto';
