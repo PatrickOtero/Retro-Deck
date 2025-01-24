@@ -1,12 +1,11 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { app } from 'electron';
-import axiosInstance from '../utils/axiosInstace';
+import log from 'electron-log';
 import { Emulator } from '../interfaces/interfaces';
-import log from "electron-log";
 import { DatabaseController } from './database/databaseController';
 
-export class EmulatorListService {
+export class EmulatorListLocalService {
   private emulatorPath: string;
   private dbController: DatabaseController;
 
@@ -14,56 +13,62 @@ export class EmulatorListService {
     this.emulatorPath = app.isPackaged
       ? path.join(process.resourcesPath, 'emulators')
       : path.join(app.getAppPath(), 'emulators');
-    
+
     this.dbController = new DatabaseController();
   }
 
   async filterValidExecutables(files: string[]): Promise<string[]> {
     log.info('Filtrando executáveis válidos na pasta de emuladores...');
-    return files.filter(file => {
+    return files.filter((file) => {
       const filePath = path.join(this.emulatorPath, file);
       const stats = fs.statSync(filePath);
-      const isValid = stats.size > 2.5 * 1024 * 1024;
+      const isValid = stats.size > 2 * 1024 * 1024;
       log.info(`Arquivo analisado: ${file}, Tamanho: ${stats.size}, Válido: ${isValid}`);
       return isValid;
     });
   }
 
-  async getEmulatorList(): Promise<Emulator[] | { message: string }[]> {
+  async getLocalEmulatorList(): Promise<Emulator[]> {
     try {
-      const files = fs.readdirSync(this.emulatorPath).filter(file =>
+      const files = fs.readdirSync(this.emulatorPath).filter((file) =>
         file.endsWith('.exe')
       );
-      log.info(`Encontrados arquivos executáveis: ${files}`);
-  
+      log.info(`Arquivos executáveis encontrados: ${files}`);
+
       const validExecutables = await this.filterValidExecutables(files);
       log.info(`Executáveis válidos: ${validExecutables}`);
-  
+
       const emulatorDataPromises = validExecutables.map(async (validExecutable) => {
         const emulatorName = path.parse(validExecutable).name;
-  
+
         try {
-          log.info(`Buscando informações do emulador: ${emulatorName}`);
-          const response = await axiosInstance.get<any>(`/getEmulator/${emulatorName}`);
-  
-          if (!response.data.emulatorName) {
-            log.warn(`Dados incompletos para o emulador ${emulatorName}`);
-            return { message: response.data.message };
+          log.info(`Buscando informações do emulador no banco local: ${emulatorName}`);
+          const emulator = await this.dbController.getEmulatorByName(emulatorName);
+
+          if (!emulator) {
+            log.warn(`Emulador não encontrado no banco local: ${emulatorName}`);
+            return null;
           }
-  
-          await this.dbController.saveEmulator(emulatorName);
-  
-          return response.data;
+
+          emulator.romExtensions = JSON.parse(emulator.romExtensions);
+
+          log.info(emulator.romExtensions)
+
+          return emulator;
         } catch (error: any) {
           log.error(`Erro ao buscar o emulador ${emulatorName}: ${error.message}`);
-          return { message: `Erro ao buscar o emulador: ${emulatorName}` };
+          return null;
         }
       });
-  
-      return await Promise.all(emulatorDataPromises);
+
+      const emulatorData = await Promise.all(emulatorDataPromises);
+
+      log.info(emulatorData)
+      
+      return emulatorData.filter((emulator) => emulator !== null) as Emulator[];
     } catch (error: any) {
       log.error(`Erro ao listar emuladores: ${error.message}`);
-      return [{ message: 'Erro ao listar emuladores.' }];
+      return [];
     }
-  }  
+  }
 }

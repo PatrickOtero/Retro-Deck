@@ -7,11 +7,11 @@ import * as fs from 'fs';
 function ensureDirectoriesExist() {
   const romsPath = app.isPackaged 
     ? path.join(process.resourcesPath, 'roms') 
-    : path.join(app.getAppPath(), 'resources', 'roms');
+    : path.join(app.getAppPath(), 'roms');
 
   const emulatorsPath = app.isPackaged 
     ? path.join(process.resourcesPath, 'emulators') 
-    : path.join(app.getAppPath(), 'resources', 'emulators');
+    : path.join(app.getAppPath(), 'emulators');
 
   if (!fs.existsSync(romsPath)) {
     log.warn(`Diretório "roms" não encontrado em: ${romsPath}`);

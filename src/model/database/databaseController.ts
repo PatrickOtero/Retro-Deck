@@ -9,43 +9,73 @@ export class DatabaseController {
       this.service = new DatabaseService();
     }
 
-    async saveOrUpdateEmulators(emulators: Emulator[]): Promise<{ message: string }[]> {
-        try {
-          await this.service.upsertEmulators(emulators);
-          return [{ message: 'Emuladores salvos ou atualizados com sucesso!' }];
-        } catch (error: any) {
-          console.error('Erro ao salvar ou atualizar emuladores:', error.message);
-          return [{ message: 'Erro ao salvar ou atualizar emuladores.' }];
-        }
+    async getAllEmulators(): Promise<Emulator[]> {
+      try {
+        const emulators = await this.service.getAllEmulators();
+        return emulators;
+      } catch (error: any) {
+        console.error('Erro ao buscar todos os emuladores:', error.message);
+        return [];
       }
-      
-      async saveOrUpdateGames(games: Game[]): Promise<{ message: string }[]> {
-        try {
-          await this.service.upsertGames(games);
-          return [{ message: 'Jogos salvos ou atualizados com sucesso!' }];
-        } catch (error: any) {
-          console.error('Erro ao salvar ou atualizar jogos:', error.message);
-          return [{ message: 'Erro ao salvar ou atualizar jogos.' }];
-        }
-      }
-
-  async getEmulators(): Promise<Emulator[]> {
-    log.info("Função 'getEmulators' do banco de dados local do app sendo executada");
-    try {
-      return await this.service.getEmulators();
-    } catch (error: any) {
-      console.error('Erro ao obter emuladores:', error.message);
-      return [];
     }
-  }
 
-  async getGames(): Promise<Game[]> {
-    log.info("Função 'getGames' do banco de dados local do app sendo executada");
+    async getAllGames(): Promise<Game[]> {
+      try {
+        const games = await this.service.getAllGames();
+        return games;
+      } catch (error: any) {
+        console.error('Erro ao buscar todos os games:', error.message);
+        return [];
+      }
+    }
+
+    async saveEmulator(emulatorName: string): Promise<{ message: string }> {
+
+      log.info("saveEmulator executado")
+      if (!emulatorName) {
+        return { message: 'Emulator name is required' };
+      }
+
+      try {
+        await this.service.saveEmulator(emulatorName);
+        return { message: 'Emulator created successfully' };
+      } catch (error: any) {
+        console.error('Erro ao salvar o emulador no banco de dados:', error.message);
+        return { message: 'Internal server error' };
+      }
+    }
+      
+      async saveOrUpdateGames(game: Game): Promise<{ message: string }[]> {
+        try {
+          await this.service.upsertGames(game);
+          return [{ message: 'Jogo salvo ou atualizado com sucesso!' }];
+        } catch (error: any) {
+          console.error('Erro ao salvar ou atualizar jogo:', error.message);
+          return [{ message: 'Erro ao salvar ou atualizar jogo.' }];
+        }
+      }
+
+      async getEmulatorByName(emulatorName: string): Promise<Emulator | null> {
+        log.info(`Buscando emulador pelo nome: ${emulatorName}`);
+        try {
+          const emulator = await this.service.getEmulatorByName(emulatorName);
+          if (!emulator) {
+            log.warn(`Emulador não encontrado: ${emulatorName}`);
+          }
+          return emulator;
+        } catch (error: any) {
+          log.error(`Erro ao obter emulador: ${error.message}`);
+          return null;
+        }
+      }
+
+  async getGameByName(gameId: string): Promise<Game | null> {
+    log.info(`Buscando jogo com ID: ${gameId} no banco de dados local...`);
     try {
-      return await this.service.getGames();
+      return await this.service.getGameByName(gameId);
     } catch (error: any) {
-      console.error('Erro ao obter jogos:', error.message);
-      return [];
+      console.error('Erro ao obter jogo:', error.message);
+      return null;
     }
   }
 

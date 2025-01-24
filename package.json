@@ -10,7 +10,7 @@
     "@electron/fuses": "^1.8.0",
     "@types/electron": "^1.4.38",
     "@types/knex": "^0.15.2",
-    "@types/node": "^22.10.5",
+    "@types/node": "^22.10.7",
     "@types/sqlite3": "^3.1.11",
     "css-loader": "^7.1.2",
     "electron": "^33.3.1",
@@ -92,6 +92,7 @@
     "type-fest": "^0.13.1",
     "undici-types": "^6.19.8",
     "universalify": "^0.1.2",
+    "uuid": "^11.0.5",
     "wrappy": "^1.0.2",
     "yauzl": "^2.10.0"
   },

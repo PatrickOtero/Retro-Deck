@@ -10,7 +10,7 @@ export interface Game {
 export interface Emulator {
   id: string;
   emulatorName: string;
-  romExtensions: string[];
+  romExtensions: string;
   createdAt?: string;
 }
 

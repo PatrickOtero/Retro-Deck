@@ -1,12 +1,15 @@
 import path from 'path';
 
-export default {
+const knexConfig = {
   client: 'sqlite3',
   connection: {
-    filename: path.join(process.cwd(), 'src', 'model', 'database', 'retro-portal-local-database.sqlite'),
+    filename: "./src/model/database/retro-portal",
   },
+  useNullAsDefault: true,
   migrations: {
     directory: path.resolve(__dirname, 'migrations'),
     tableName: 'knex_migrations',
   },
 };
+
+export default knexConfig

@@ -1,6 +1,7 @@
 import { Emulator, Game } from '../../interfaces/interfaces';
 import { DatabaseRepository } from './databaseRepository';
-import knexInstance from "../../../connection"
+import knexInstance from "../../connection"
+import log from "electron-log";
 
 export class DatabaseService {
   private repository: DatabaseRepository;
@@ -9,32 +10,42 @@ export class DatabaseService {
     this.repository = new DatabaseRepository(knexInstance);
   }
 
-  async saveEmulators(emulators: Emulator[]): Promise<void> {
-    await this.repository.insertEmulators(emulators);
+  async getAllEmulators(): Promise<Emulator[]> {
+    return await this.repository.getAllEmulators();
   }
 
-  async saveGames(games: Game[]): Promise<void> {
-    await this.repository.insertGames(games);
+  async getAllGames(): Promise<Game[]> {
+    return await this.repository.getAllGames();
   }
 
-  async getEmulators(): Promise<Emulator[]> {
-    return await this.repository.getEmulators();
-  }
+  async saveEmulator(emulatorName: string): Promise<void> {
+    const emulatorExists = await this.repository.findEmulatorByName(emulatorName);
 
-  async getGames(): Promise<Game[]> {
-    return await this.repository.getGames();
-  }
-
-  async upsertEmulators(emulators: Emulator[]): Promise<void> {
-    for (const emulator of emulators) {
-      await this.repository.upsertEmulator(emulator);
+    if (emulatorExists) {
+      throw new Error('Emulator already registered');
     }
+
+    await this.repository.insertEmulator(emulatorName);
+  }
+
+  async saveGames(game: Game): Promise<void> {
+    await this.repository.insertGames(game);
+  }
+
+  async getEmulatorByName(emulatorName: string): Promise<Emulator | null> {
+    return await this.repository.findEmulatorByName(emulatorName);
+  }
+
+  async getGameByName(gameId: string): Promise<Game | null> {
+    return await this.repository.getGameByName(gameId);
+  }
+
+  async upsertEmulators(emulator: Emulator): Promise<void> {
+      await this.repository.upsertEmulator(emulator);
   }
   
-  async upsertGames(games: Game[]): Promise<void> {
-    for (const game of games) {
+  async upsertGames(game: Game): Promise<void> {
       await this.repository.upsertGame(game);
-    }
   }
 
   async checkEmulatorExists(emulatorId: string): Promise<boolean> {

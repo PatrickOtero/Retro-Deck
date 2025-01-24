@@ -524,34 +524,49 @@ function goBackToMenu() {
 }
 
 async function loadEmulators(): Promise<void> {
-  console.log("carroussel open: " + isCarrouselOpen +  " " + "emulator list: " + isEmulatorMenuOpen + " " + "main menu open: " + mainMenuOpen)
+  console.log("carroussel open: " + isCarrouselOpen + " " + "emulator list: " + isEmulatorMenuOpen + " " + "main menu open: " + mainMenuOpen);
 
-  setMenuState(false, true, false)
+  setMenuState(false, true, false);
+  showLoading();
 
-    showLoading();
 
-    if (emulators.length === 0) {
-      const emulatorList = await window.electronAPI.registerEmulator();
-      hideLoading()
+  let emulatorList = await window.electronAPI.getLocalEmulator();
+  console.log("Lista que verifica se tem alguma coisa no banco: " + emulatorList)
 
-      if (emulatorList.length === 1 && emulatorList[0].message.includes("não existe")) {
-        noContentWarning();
-        return;
-      }
+  if (emulatorList.length === 0) {
+
+    emulatorList = await window.electronAPI.registerEmulator();
+    console.log("Lista depois da primeira execução: " + emulatorList)
+  }
+
+  if (emulatorList.length > 0) {
+    const newExecutables = await window.electronAPI.checkForNewExecutables();
+    if (newExecutables.length > 0) {
+      console.log("Novos emuladores detectados:", newExecutables);
+      await window.electronAPI.registerNewExecutables(newExecutables);
+      emulatorList = await window.electronAPI.getLocalEmulator();
+
+      console.log("lista depois de verificar novos executáveis: " + emulatorList)
     }
-    
-    const carrouselTitle = document.querySelector(".select-game-title") as HTMLElement;
+  }
 
-    carrouselTitle.style.display = "none"
+  hideLoading();
 
-    prevButton.style.display = "none"
-    nextButton.style.display = "none"
+  if (emulatorList.length === 0) {
+    noContentWarning();
+    return;
+  }
 
-    emulators = await window.electronAPI.getEmulator();
+  const carrouselTitle = document.querySelector(".select-game-title") as HTMLElement;
+  carrouselTitle.style.display = "none";
 
-    renderEmulators();
+  prevButton.style.display = "none";
+  nextButton.style.display = "none";
 
-    hideLoading();
+  emulators = emulatorList;
+  renderEmulators();
+
+  hideLoading();
 }
 
 function renderEmulators(): void {
@@ -626,35 +641,44 @@ function selectEmulator(emulator: any): void {
 }
 
 async function loadGames(supportedExtensions: string[]): Promise<void> {
-
-  setMenuState(false, false, true)
+  setMenuState(false, false, true);
   try {
     showLoading();
 
     const carrouselTitle = document.querySelector(".select-game-title") as HTMLElement;
+    carrouselTitle.style.display = "block";
 
-    carrouselTitle.style.display = "block"
+    const checkResult = await window.electronAPI.checkIfRomsExist();
 
-    if (games.length === 0) {
-      await window.electronAPI.searchAndSaveGames(supportedExtensions)
+    console.log(checkResult)
+
+    if (checkResult.message.includes('Não existem ROMs')) {
+      console.log("não existem roms no banco local")
+      games = await window.electronAPI.getGames(supportedExtensions);
+    } else {
+      games = await window.electronAPI.getLocalGames(supportedExtensions);
     }
 
-    games = await window.electronAPI.getGames(supportedExtensions);
+    const checkForNewRoms = await window.electronAPI.checkForNewRoms()
+
+    if (checkForNewRoms.hasNewRoms) {
+      console.log("Novas roms encontradas no banco local")
+      games = await window.electronAPI.getGames(supportedExtensions);
+    }
 
     if (games.length === 0) {
       displayNoGamesMessage();
-      hideLoading();
-      return;
+    } else {
+      renderGames();
     }
 
-    renderGames();
     hideLoading();
-
   } catch (error) {
     console.error('Erro ao carregar jogos:', error);
     hideLoading();
   }
 }
+
 
 function displayNoGamesMessage(): void {
   gameListElement.innerHTML = '<li>Nenhum jogo encontrado</li>';

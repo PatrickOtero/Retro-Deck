@@ -18,6 +18,18 @@ export class GameController {
 
   private setupIpcHandlers(): void {
 
+    ipcMain.handle('check-if-roms-exist', async (): Promise<{ message: string }> => {
+      console.log('Check if ROMs exist executado!');
+      const result = await this.gameModel.checkIfRomsExist();
+      return result;
+    });
+  
+    ipcMain.handle('get-local-games', async (event, supportedExtensions: string[]): Promise<Game[]> => {
+      console.log('Get local games executado!', supportedExtensions);
+      const games = await this.gameModel.getLocalGamesList(supportedExtensions);
+      return games;
+    });
+
     ipcMain.handle('search-and-save-games', async (event, supportedExtensions: string[]): Promise<{ message: string }[]> => {
       console.log('Search and save games executado!', supportedExtensions);
     
@@ -48,9 +60,31 @@ export class GameController {
       return emulatorRegistered;
     });
 
-    ipcMain.handle('get-emulator', async (): Promise<Emulator[] | { message: string} []> => {
+    ipcMain.handle('check-for-new-executables', async (): Promise<string[]> => {
+      console.log('Check for new executables executado!');
+      const newExecutables = await this.gameModel.checkForNewExecutables();
+      return newExecutables;
+    });
+    
+    ipcMain.handle('register-new-executables', async (event, executables: string[]): Promise<{ success: boolean; message: string }> => {
+      console.log('Register new executables executado!', executables);
+    
+      if (!executables || executables.length === 0) {
+        return { success: false, message: 'Nenhum executável fornecido.' };
+      }
+    
+      try {
+        await this.gameModel.registerNewExecutables(executables);
+        return { success: true, message: 'Executáveis registrados com sucesso.' };
+      } catch (error: any) {
+        console.error(`Erro ao registrar executáveis: ${error.message}`);
+        return { success: false, message: error.message };
+      }
+    });
+
+    ipcMain.handle('get-local-emulator', async (): Promise<Emulator[] | { message: string} []> => {
       console.log("Get emulators executado!")
-      const emulators = await this.gameModel.getEmulatorList();
+      const emulators = await this.gameModel.getLocalEmulatorList();
       return emulators;
     });
 
@@ -105,6 +139,8 @@ export class GameController {
     }
   
     this.isEmulatorRunning = true;
+
+    log.info(gamePath)
   
     const childProcess = exec(`"${emulatorPath}" "${gamePath}"`, (err, stdout, stderr) => {
       if (err) {

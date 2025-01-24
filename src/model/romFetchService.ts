@@ -1,11 +1,11 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { app } from 'electron';
-import axiosInstance from '../utils/axiosInstace';
 import { Game } from '../interfaces/interfaces';
 import { DatabaseController } from './database/databaseController';
+import log from "electron-log";
 
-export class GameListService {
+export class LocalGameListService {
   private romsPath: string;
   private dbController: DatabaseController;
 
@@ -17,24 +17,25 @@ export class GameListService {
     this.dbController = new DatabaseController();
   }
 
-  async getGamesList(supportedExtensions: string[]): Promise<Game[]> {
+  async getLocalGamesList(supportedExtensions: string[]): Promise<Game[]> {
+
+    
     const files = fs.readdirSync(this.romsPath).filter(file =>
       supportedExtensions.some(ext => file.endsWith(ext))
     );
-  
+
     const gameDataPromises = files.map(async (file) => {
       const romName = path.parse(file).name;
-  
+
       try {
-        const responseLocal = await axiosInstance.get<any>(`/searchGamesLocalDb/${romName}`);
-  
-        if (responseLocal.data?.game?.gameName) {
-          const game = responseLocal.data.game;
-  
-          await this.dbController.saveOrUpdateGames(game);
+        const game = await this.dbController.getGameByName(romName);
+
+        if (game) {
+          game.fileName = file
 
           return game;
         }
+
         return {
           id: '',
           gameName: romName,
@@ -43,7 +44,7 @@ export class GameListService {
           fileName: file,
         };
       } catch (error: any) {
-        console.error(`Erro ao buscar dados do jogo ${romName}:`, error.message);
+        log.error(`Erro ao buscar dados do jogo ${romName}:`, error.message);
         return {
           id: '',
           gameName: romName,
@@ -53,7 +54,6 @@ export class GameListService {
         };
       }
     });
-  
     return await Promise.all(gameDataPromises);
   }
 }
