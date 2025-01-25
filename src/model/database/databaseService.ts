@@ -52,6 +52,10 @@ export class DatabaseService {
     return await this.repository.checkEmulatorExists(emulatorId);
   }
 
+  async checkGamesExist(gameNames: string[]): Promise<string[]> {
+    return await this.repository.checkGamesExist(gameNames);
+  }
+
   async checkGameExists(gameId: string): Promise<boolean> {
     return await this.repository.checkGameExists(gameId);
   }

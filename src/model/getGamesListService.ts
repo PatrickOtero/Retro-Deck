@@ -13,7 +13,6 @@ export class GameListService {
     this.romsPath = app.isPackaged
       ? path.join(process.resourcesPath, 'roms')
       : path.join(app.getAppPath(), 'roms');
-    
     this.dbController = new DatabaseController();
   }
 
@@ -26,15 +25,21 @@ export class GameListService {
       const romName = path.parse(file).name;
   
       try {
-        const responseLocal = await axiosInstance.get<any>(`/searchGamesLocalDb/${romName}`);
+        const existingGame = await this.dbController.getGameByName(romName);
+        if (existingGame) {
+          existingGame.fileName = file; 
+          return existingGame;
+        }
   
+        const responseLocal = await axiosInstance.get<any>(`/searchGamesLocalDb/${romName}`);
         if (responseLocal.data?.game?.gameName) {
           const game = responseLocal.data.game;
+          game.fileName = file;
   
           await this.dbController.saveOrUpdateGames(game);
-
           return game;
         }
+  
         return {
           id: '',
           gameName: romName,
@@ -55,5 +60,5 @@ export class GameListService {
     });
   
     return await Promise.all(gameDataPromises);
-  }
+  }  
 }

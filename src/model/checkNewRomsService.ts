@@ -37,6 +37,8 @@ export class CheckNewRomService {
 
       const hasNewRoms = Object.values(romStatus).some(status => status.includes('Nova ROM'));
 
+      log.info(hasNewRoms)
+
       return { hasNewRoms, romStatus };
     } catch (error: any) {
       log.error("Erro ao verificar ROMs:", error.message);

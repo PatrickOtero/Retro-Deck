@@ -19,19 +19,16 @@ export class GameController {
   private setupIpcHandlers(): void {
 
     ipcMain.handle('check-if-roms-exist', async (): Promise<{ message: string }> => {
-      console.log('Check if ROMs exist executado!');
       const result = await this.gameModel.checkIfRomsExist();
       return result;
     });
   
     ipcMain.handle('get-local-games', async (event, supportedExtensions: string[]): Promise<Game[]> => {
-      console.log('Get local games executado!', supportedExtensions);
       const games = await this.gameModel.getLocalGamesList(supportedExtensions);
       return games;
     });
 
     ipcMain.handle('search-and-save-games', async (event, supportedExtensions: string[]): Promise<{ message: string }[]> => {
-      console.log('Search and save games executado!', supportedExtensions);
     
       if (!supportedExtensions || supportedExtensions.length === 0) {
         console.error('Nenhuma extensão fornecida.');
@@ -43,7 +40,6 @@ export class GameController {
     });
 
     ipcMain.handle('get-games', async (event, supportedExtensions: string[]): Promise<Game[]> => {
-      console.log("Get games executado!", supportedExtensions)
 
       if (!supportedExtensions || supportedExtensions.length === 0) {
         console.error('Nenhuma extensão fornecida.');
@@ -55,19 +51,16 @@ export class GameController {
     });
 
     ipcMain.handle('register-emulator', async (): Promise<{ message: string}[]> => {
-      console.log("Register emulator executado!")
       const emulatorRegistered = await this.gameModel.registerEmulator();
       return emulatorRegistered;
     });
 
     ipcMain.handle('check-for-new-executables', async (): Promise<string[]> => {
-      console.log('Check for new executables executado!');
       const newExecutables = await this.gameModel.checkForNewExecutables();
       return newExecutables;
     });
     
     ipcMain.handle('register-new-executables', async (event, executables: string[]): Promise<{ success: boolean; message: string }> => {
-      console.log('Register new executables executado!', executables);
     
       if (!executables || executables.length === 0) {
         return { success: false, message: 'Nenhum executável fornecido.' };
@@ -83,7 +76,6 @@ export class GameController {
     });
 
     ipcMain.handle('get-local-emulator', async (): Promise<Emulator[] | { message: string} []> => {
-      console.log("Get emulators executado!")
       const emulators = await this.gameModel.getLocalEmulatorList();
       return emulators;
     });

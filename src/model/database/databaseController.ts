@@ -89,6 +89,15 @@ export class DatabaseController {
     }
   }
 
+  async checkGamesExist(gameNames: string[]): Promise<string[]> {
+    try {
+      return await this.service.checkGamesExist(gameNames);
+    } catch (error: any) {
+      console.error('Erro ao verificar múltiplos jogos no banco de dados:', error.message);
+      return [];
+    }
+  }
+
   async checkGameExists(gameId: string): Promise<boolean> {
     log.info("Função 'checkGameExists' do banco de dados local do app sendo executada");
     try {

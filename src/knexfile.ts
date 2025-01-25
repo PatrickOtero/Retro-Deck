@@ -1,9 +1,12 @@
 import path from 'path';
+import { app } from 'electron';
 
 const knexConfig = {
   client: 'sqlite3',
   connection: {
-    filename: "./src/model/database/retro-portal",
+    filename: app.isPackaged 
+    ? path.join(process.resourcesPath, 'database', 'retro-portal')
+    : path.join(__dirname, 'model', 'database', 'retro-portal'),
   },
   useNullAsDefault: true,
   migrations: {

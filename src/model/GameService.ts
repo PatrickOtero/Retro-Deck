@@ -32,7 +32,6 @@ export class GameModel {
     ? path.join(process.resourcesPath, 'roms') 
     : path.join(app.getAppPath(),'roms');
 
-    console.log("roms: " + this.romsPath)
     log.info("roms: " + this.romsPath)
   
   this.emulatorPath = app.isPackaged 
@@ -66,7 +65,6 @@ export class GameModel {
   }
 
   async getGamesList(supportedExtensions: string[]): Promise<Game[]> {
-    console.log()
     return this.gameListService.getGamesList(supportedExtensions);
   }
 

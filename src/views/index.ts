@@ -39,8 +39,6 @@ let mainMenuOpen = true
 let mainMenuButtons: HTMLElement[] = [];
 let emulatorListButtons: HTMLElement[] = [];
 
-console.log("Buttons array:", mainMenuButtons);
-
 function setMenuState(mainMenu: boolean, emulatorMenu: boolean, carrousel: boolean) {
   mainMenuOpen = mainMenu;
   isEmulatorMenuOpen = emulatorMenu;
@@ -51,17 +49,14 @@ function setMenuState(mainMenu: boolean, emulatorMenu: boolean, carrousel: boole
   const carrouselElement = document.getElementById('game-selector');
 
   if (!carrouselElement) {
-    console.log("Carrousel element not found.");
     return;
   }
 
   if (!mainMenuElement) {
-    console.log("Main menu element not found.");
     return;
   }
 
   if (!emulatorMenuElement) {
-    console.log("Main menu element not found.");
     return;
   }
 
@@ -113,33 +108,44 @@ function mainMenuLoader() {
   });
 }
 
+async function noContentCheck() {
+
+  let emulatorList = await window.electronAPI.getLocalEmulator();
+
+  if (emulatorList.length === 0) {
+    const registerResponse = await window.electronAPI.registerEmulator();
+    
+    if (registerResponse.length === 0 || (registerResponse.length === 1 && registerResponse[0].message)) {
+      noContentWarning();
+      return;
+    }
+
+    emulatorList = await window.electronAPI.getLocalEmulator(); 
+  }
+
+  emulators = emulatorList;
+
+  if(emulatorList.length >= 1) {
+    mainMenuLoader()
+  }
+
+}
+
 function noContentWarning(): void {
-  const emulatorList = document.querySelector("#emulator-list-container") as HTMLElement;
-  const gameCarrousel = document.getElementById("game-list")
+  hideLoading()
+  setMenuState(false, false, false)
+
+  const noContentWarningContainer = document.querySelector("#no-content-warning-container") as HTMLElement;
 
   nextButton.style.display = "none"
   prevButton.style.display = "none"
 
-  const appTitle = document.querySelector(".select-game-title") as HTMLElement
+  const noContentInfoContainer = document.createElement("div");
+  noContentInfoContainer.classList.add("no-content-info-container");
 
   const noContentButton = document.createElement("button")
   noContentButton.classList.add("no-content-button")
   noContentButton.innerHTML = "Reload"
-
-  appTitle.style.display = "none"
-
-  if (!gameCarrousel) {
-    console.log("Game carrousel container not found!");
-    return;
-  }
-
-  if (!emulatorList) {
-    console.log("Emulator list container not found!");
-    return;
-  }
-  
-  const noContentContainer = document.createElement("div");
-  noContentContainer.classList.add("no-content-container");
 
   const noContentTitle = document.createElement("h1");
   noContentTitle.innerHTML = "No Content!";
@@ -155,20 +161,27 @@ function noContentWarning(): void {
   `;
   noContentInfo.classList.add("no-content-info");
 
-  noContentContainer.appendChild(noContentTitle);
-  noContentContainer.appendChild(noContentInfo);
-  noContentContainer.appendChild(noContentButton)
+  noContentInfoContainer.appendChild(noContentTitle);
+  noContentInfoContainer.appendChild(noContentInfo);
+  noContentInfoContainer.appendChild(noContentButton)
   
-  emulatorList.appendChild(noContentContainer);
+  noContentWarningContainer.appendChild(noContentInfoContainer);
+
+  noContentWarningContainer.style.display = "block"
 
   noContentButton.addEventListener("click", async () => {
-    if (!emulators.length) {
-      noContentContainer.style.display = "none"
+    let emulatorList = await window.electronAPI.registerEmulator();
+    emulatorList = await window.electronAPI.getLocalEmulator();
+    const mainMenu = document.getElementById('main-menu') as HTMLElement;
+    const emulatorListContainer = document.getElementById('emulator-list-container') as HTMLElement;
 
-      showLoading()
+    if (emulatorList.length >= 1 && !emulatorList[0].message) {
+      noContentWarningContainer.style.display = "none"
+      emulatorListContainer.style.display = "block"
+
       loadEmulators()
-      hideLoading()
     } else {
+      setMenuState(false, false, false)
       return
     }
   })
@@ -305,8 +318,6 @@ function handleGamepadInput(gamepad: Gamepad) {
 }
 
 function handleMainMenuInput(axisY: number, buttonAPressed: boolean) {
-  console.log('Current State:', { mainMenuOpen, isEmulatorMenuOpen, isCarrouselOpen });
-
   if (!mainMenuOpen || mainMenuCooldown) {
     return;
   }
@@ -331,8 +342,6 @@ function handleMainMenuInput(axisY: number, buttonAPressed: boolean) {
 }
 
 function handleEmulatorMenuInput(axisY: number, buttonAPressed: boolean) {
-  console.log('Current State:', { mainMenuOpen, isEmulatorMenuOpen, isCarrouselOpen });
-
   if (!isEmulatorMenuOpen || emulatorMenuCooldown) {
     return
   }
@@ -481,7 +490,7 @@ function applyRandomRotation() {
 }
 
 window.onload = () => {
-  mainMenuLoader()
+  noContentCheck()
   arrangeIconsRandomly();
   applyRandomRotation();
   generateStars()
@@ -494,22 +503,22 @@ window.addEventListener('resize', () => {
 });
 
 function showLoading(): void {
-  const loadText = document.createElement("p")
-  loadText.classList.add("load-text")
- 
-  loadingElement.innerHTML = ""
-  
-  if (!mainMenuOpen && isEmulatorMenuOpen && !isCarrouselOpen) {
-    loadText.textContent = "Searching emulators"
-  } else if (!mainMenuOpen && !isEmulatorMenuOpen && isCarrouselOpen) {
-    loadText.textContent = "Searching Games"
-  }
-  
-  loadingElement.appendChild(loadText)
+  const loadText = document.querySelector("#loading .load-text") || document.createElement("p");
+  loadText.classList.add("load-text");
 
-  loadingElement.style.display = 'flex';
-  loadingElement.style.opacity = '1';
-  loadingElement.style.pointerEvents = 'auto';
+  if (!mainMenuOpen && isEmulatorMenuOpen && !isCarrouselOpen) {
+    loadText.textContent = "Searching emulators";
+  } else if (!mainMenuOpen && !isEmulatorMenuOpen && isCarrouselOpen) {
+    loadText.textContent = "Searching Games";
+  }
+
+  if (!document.querySelector("#loading .load-text")) {
+    loadingElement.appendChild(loadText);
+  }
+
+  loadingElement.style.display = "flex";
+  loadingElement.style.opacity = "1";
+  loadingElement.style.pointerEvents = "auto";
 }
 
 function hideLoading(): void {
@@ -520,42 +529,26 @@ function hideLoading(): void {
 }
 
 function goBackToMenu() {
-  setMenuState(true, false, false)
+  mainMenuLoader()
 }
 
 async function loadEmulators(): Promise<void> {
-  console.log("carroussel open: " + isCarrouselOpen + " " + "emulator list: " + isEmulatorMenuOpen + " " + "main menu open: " + mainMenuOpen);
-
   setMenuState(false, true, false);
   showLoading();
 
-
   let emulatorList = await window.electronAPI.getLocalEmulator();
-  console.log("Lista que verifica se tem alguma coisa no banco: " + emulatorList)
-
-  if (emulatorList.length === 0) {
-
-    emulatorList = await window.electronAPI.registerEmulator();
-    console.log("Lista depois da primeira execução: " + emulatorList)
-  }
 
   if (emulatorList.length > 0) {
     const newExecutables = await window.electronAPI.checkForNewExecutables();
     if (newExecutables.length > 0) {
-      console.log("Novos emuladores detectados:", newExecutables);
       await window.electronAPI.registerNewExecutables(newExecutables);
       emulatorList = await window.electronAPI.getLocalEmulator();
-
-      console.log("lista depois de verificar novos executáveis: " + emulatorList)
     }
   }
 
-  hideLoading();
+  emulators = emulatorList;
 
-  if (emulatorList.length === 0) {
-    noContentWarning();
-    return;
-  }
+  hideLoading();
 
   const carrouselTitle = document.querySelector(".select-game-title") as HTMLElement;
   carrouselTitle.style.display = "none";
@@ -563,19 +556,13 @@ async function loadEmulators(): Promise<void> {
   prevButton.style.display = "none";
   nextButton.style.display = "none";
 
-  emulators = emulatorList;
+  
   renderEmulators();
 
   hideLoading();
 }
 
 function renderEmulators(): void {
-  if (emulators.length === 0) {
-    console.log('Nenhum emulador encontrado.');
-    noContentWarning();
-    return;
-  }
-
   emulatorListElement.innerHTML = ''; 
 
   const newEmulatorListContainer = createEmulatorContainer(emulators);
@@ -608,7 +595,6 @@ function createEmulatorContainer(emulators: any): HTMLElement {
   }
 
   emulatorListButtons = Array.from(document.querySelectorAll(".emulator-menu-button"));
-  console.log("Atualizando lista de botões de emuladores:", emulatorListButtons);
 
   return emulatorListContainer;
 }
@@ -617,7 +603,6 @@ function selectEmulator(emulator: any): void {
   setMenuState(false, false, true)
 
   selectedEmulator = emulator;
-  console.log('Emulador selecionado:', selectedEmulator);
 
   const loadingElement = document.getElementById('loading')!;
   loadingElement.style.display = 'block'; 
@@ -648,23 +633,7 @@ async function loadGames(supportedExtensions: string[]): Promise<void> {
     const carrouselTitle = document.querySelector(".select-game-title") as HTMLElement;
     carrouselTitle.style.display = "block";
 
-    const checkResult = await window.electronAPI.checkIfRomsExist();
-
-    console.log(checkResult)
-
-    if (checkResult.message.includes('Não existem ROMs')) {
-      console.log("não existem roms no banco local")
-      games = await window.electronAPI.getGames(supportedExtensions);
-    } else {
-      games = await window.electronAPI.getLocalGames(supportedExtensions);
-    }
-
-    const checkForNewRoms = await window.electronAPI.checkForNewRoms()
-
-    if (checkForNewRoms.hasNewRoms) {
-      console.log("Novas roms encontradas no banco local")
-      games = await window.electronAPI.getGames(supportedExtensions);
-    }
+    games = await window.electronAPI.getGames(supportedExtensions);
 
     if (games.length === 0) {
       displayNoGamesMessage();
@@ -769,12 +738,19 @@ async function startGame() {
 }
 
 function moveToNextGame(): void {
-  currentIndex = (currentIndex + 1) % games.length; 
+  currentIndex = (currentIndex + 1) % games.length;
+  if (!currentIndex) {
+    currentIndex = 0
+  }
   renderGames();
 }
 
 function moveToPrevGame(): void {
-  currentIndex = (currentIndex - 1 + games.length) % games.length; 
+  currentIndex = (currentIndex - 1 + games.length) % games.length;
+  if (!currentIndex) {
+    currentIndex = 0
+  }
+
   renderGames();
 }
 

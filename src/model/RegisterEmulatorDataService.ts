@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { app } from 'electron';
 import { DatabaseController } from './database/databaseController';
+import log from "electron-log"
 
 export class RegisterEmulatorService {
   private emulatorPath: string;
@@ -44,6 +45,7 @@ export class RegisterEmulatorService {
       try {
         const response = await this.db.saveEmulator(emulatorName);
         return response;
+
       } catch (error: any) {
         console.error(`Erro ao registrar dados do emulador ${emulatorName}:`, error.message);
         return { message: `Erro ao registrar o emulador: ${emulatorName}` };

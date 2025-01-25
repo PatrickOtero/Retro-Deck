@@ -4,6 +4,26 @@ import { GameController } from './controller/GameController';
 import log from 'electron-log';
 import * as fs from 'fs';
 
+function ensureDatabaseExists() {
+    if (app.isPackaged) {
+    const dbSourcePath = path.join(__dirname, 'model', 'database', 'retro-portal');
+
+    const dbDestinationPath = path.join(process.resourcesPath, 'database', 'retro-portal');
+
+    if (!fs.existsSync(dbDestinationPath)) {
+      const dbDirectory = path.dirname(dbDestinationPath);
+      if (!fs.existsSync(dbDirectory)) {
+        fs.mkdirSync(dbDirectory, { recursive: true });
+      }
+
+      fs.copyFileSync(dbSourcePath, dbDestinationPath);
+      log.info(`Banco de dados copiado para: ${dbDestinationPath}`);
+    } else {
+      log.info('Banco de dados já existe no local externo.');
+    }
+  }
+}
+
 function ensureDirectoriesExist() {
   const romsPath = app.isPackaged 
     ? path.join(process.resourcesPath, 'roms') 
@@ -22,16 +42,16 @@ function ensureDirectoriesExist() {
   }
 }
 
-const desktopPath = path.join(app.getPath('desktop'), 'logs');
+const logResourcersPath = path.join(process.resourcesPath, 'logs');
 
-if (!fs.existsSync(desktopPath)) {
-  fs.mkdirSync(desktopPath, { recursive: true });
+if (!fs.existsSync(logResourcersPath)) {
+  fs.mkdirSync(logResourcersPath, { recursive: true });
 }
 
 const logFileName = 'main.log';
 
 log.transports.file.resolvePathFn = () => {
-  return path.join(desktopPath, logFileName ?? 'default.log');
+  return path.join(logResourcersPath, logFileName ?? 'default.log');
 };
 
 log.info('Configuração de logs inicializada. Logs serão salvos na área de trabalho.');
@@ -61,8 +81,6 @@ function createWindow() {
     .catch((err) => log.error('Erro ao carregar a janela principal:', err));
 
   new GameController();
-
-  mainWindow.webContents.openDevTools()
 
   mainWindow.on('resize', () => {
     if (!mainWindow.isFullScreen()) {
@@ -95,6 +113,7 @@ function createAboutWindow() {
 }
 
 app.whenReady().then( async () => {
+  ensureDatabaseExists()
   ensureDirectoriesExist();
   log.info('Aplicativo pronto.');
   createWindow();

@@ -2,6 +2,7 @@ import * as path from 'path';
 import { DatabaseController } from './database/databaseController';
 import { app } from 'electron';
 import fs from "fs"
+import log from "electron-log"
 
 export class RegisterNewExecutablesService {
   private emulatorPath: string;
@@ -39,7 +40,7 @@ export class RegisterNewExecutablesService {
   
       const existingEmulator = await this.db.getEmulatorByName(emulatorName);
       if (existingEmulator) {
-        console.log(`Emulador já registrado: ${emulatorName}`);
+        log.info(`Emulador já registrado: ${emulatorName}`);
         continue;
       }
       

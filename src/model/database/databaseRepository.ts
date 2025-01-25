@@ -55,6 +55,20 @@ export class DatabaseRepository {
       return count > 0;
   }
 
+  async checkGamesExist(gameNames: string[]): Promise<string[]> {
+    try {
+      const normalizedNames = gameNames.map(nameNormalizer);
+      const results = await this.db('games')
+        .select('gameName')
+        .whereIn('gameName', normalizedNames);
+  
+      return results.map((game) => game.gameName);
+    } catch (error: any) {
+      console.error('Erro ao verificar múltiplos jogos no banco de dados:', error.message);
+      throw new Error('Erro ao verificar múltiplos jogos no banco de dados');
+    }
+  }
+
   async checkGameExists(gameId: string): Promise<boolean> {
     const gameName = nameNormalizer(gameId)
     const result = await this.db('games')
@@ -130,16 +144,11 @@ export class DatabaseRepository {
   async getGameByName(gameId: string): Promise<Game> {
     const gameName = nameNormalizer(gameId)
 
-    console.log(gameName)
-
     const result = await this.db('games')
       .where('gameName', gameName)
       .first();
 
-      result.description = removeHtmlTags(result.description)
-
-      console.log("what????" + result)
-  
+      result.description = removeHtmlTags(result.description) 
     return result;
   }
 }

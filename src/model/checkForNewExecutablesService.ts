@@ -31,9 +31,13 @@ export class CheckForNewExecutablesService {
     if (!this.checkEmulatorDirectoryExists()) return [];
   
     const files = fs.readdirSync(this.emulatorPath).filter(file => file.endsWith('.exe'));
+  
     const validExecutables = await this.filterValidExecutables(files);
   
+    if (validExecutables.length === 0) return [];
+  
     const registeredEmulators = await this.db.getAllEmulators();
+  
     const newExecutables = validExecutables.filter(exe =>
       !registeredEmulators.some((emulator: any) =>
         emulator?.name?.toLowerCase() === path.parse(exe).name.toLowerCase()
