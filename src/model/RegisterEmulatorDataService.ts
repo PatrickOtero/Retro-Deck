@@ -2,7 +2,6 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { app } from 'electron';
 import { DatabaseController } from './database/databaseController';
-import log from "electron-log"
 
 export class RegisterEmulatorService {
   private emulatorPath: string;
@@ -31,7 +30,7 @@ export class RegisterEmulatorService {
 
   async registerEmulator(): Promise<{ message: string }[]> {
     if (!this.checkEmulatorDirectoryExists()) {
-      return [{ message: 'A pasta "emulators" não existe. Nenhum emulador pode ser registrado.' }];
+      return [{ message: 'The "emulators" folder does not exist. No emulator can be registered.' }];
     }
   
     const files = fs.readdirSync(this.emulatorPath).filter(file =>
@@ -47,8 +46,8 @@ export class RegisterEmulatorService {
         return response;
 
       } catch (error: any) {
-        console.error(`Erro ao registrar dados do emulador ${emulatorName}:`, error.message);
-        return { message: `Erro ao registrar o emulador: ${emulatorName}` };
+        console.error(`Error registering emulator data ${emulatorName}:`, error.message);
+        return { message: `Error registering emulator: ${emulatorName}` };
       }
     });
   

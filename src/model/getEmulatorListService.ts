@@ -19,12 +19,12 @@ export class EmulatorListService {
   }
 
   async filterValidExecutables(files: string[]): Promise<string[]> {
-    log.info('Filtrando executáveis válidos na pasta de emuladores...');
+    log.info('Filtering valid executables in the emulators folder...');
     return files.filter(file => {
       const filePath = path.join(this.emulatorPath, file);
       const stats = fs.statSync(filePath);
       const isValid = stats.size > 2.5 * 1024 * 1024;
-      log.info(`Arquivo analisado: ${file}, Tamanho: ${stats.size}, Válido: ${isValid}`);
+      log.info(`Analyzed file: ${file}, Size: ${stats.size}, Valid: ${isValid}`);
       return isValid;
     });
   }
@@ -34,20 +34,20 @@ export class EmulatorListService {
       const files = fs.readdirSync(this.emulatorPath).filter(file =>
         file.endsWith('.exe')
       );
-      log.info(`Encontrados arquivos executáveis: ${files}`);
+      log.info(`Executable files found: ${files}`);
   
       const validExecutables = await this.filterValidExecutables(files);
-      log.info(`Executáveis válidos: ${validExecutables}`);
+      log.info(`Valid executables: ${validExecutables}`);
   
       const emulatorDataPromises = validExecutables.map(async (validExecutable) => {
         const emulatorName = path.parse(validExecutable).name;
   
         try {
-          log.info(`Buscando informações do emulador: ${emulatorName}`);
+          log.info(`Fetching emulator information: ${emulatorName}`);
           const response = await axiosInstance.get<any>(`/getEmulator/${emulatorName}`);
   
           if (!response.data.emulatorName) {
-            log.warn(`Dados incompletos para o emulador ${emulatorName}`);
+            log.warn(`Incomplete data for emulator ${emulatorName}`);
             return { message: response.data.message };
           }
   
@@ -55,15 +55,15 @@ export class EmulatorListService {
   
           return response.data;
         } catch (error: any) {
-          log.error(`Erro ao buscar o emulador ${emulatorName}: ${error.message}`);
-          return { message: `Erro ao buscar o emulador: ${emulatorName}` };
+          log.error(`Error fetching emulator ${emulatorName}: ${error.message}`);
+          return { message: `Error fetching emulator: ${emulatorName}` };
         }
       });
   
       return await Promise.all(emulatorDataPromises);
     } catch (error: any) {
-      log.error(`Erro ao listar emuladores: ${error.message}`);
-      return [{ message: 'Erro ao listar emuladores.' }];
+      log.error(`Error listing emulators: ${error.message}`);
+      return [{ message: 'Error listing emulators.' }];
     }
   }  
 }

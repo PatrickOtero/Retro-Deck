@@ -643,14 +643,14 @@ async function loadGames(supportedExtensions: string[]): Promise<void> {
 
     hideLoading();
   } catch (error) {
-    console.error('Erro ao carregar jogos:', error);
+    console.error('Error when laoding games:', error);
     hideLoading();
   }
 }
 
 
 function displayNoGamesMessage(): void {
-  gameListElement.innerHTML = '<li>Nenhum jogo encontrado</li>';
+  gameListElement.innerHTML = '<li>No game found</li>';
 }
 
 function renderGames(): void {
@@ -717,23 +717,23 @@ function createGameContainer(game: any): HTMLElement {
 
 async function startGame() {
   if (!selectedEmulator) {
-    alert('Selecione um emulador primeiro!');
+    alert('Select and emulator first!');
     return;
   }
 
   const isRunning = await window.electronAPI.isEmulatorRunning();
 
   if (isRunning) {
-    alert('O emulador já está em execução.');
+    alert('Emulator is already running');
     return;
   }
 
   const result = await window.electronAPI.runGame(games[currentIndex].fileName, selectedEmulator.emulatorName);
 
   if (!result.success) {
-    console.error('Erro ao tentar iniciar o jogo.');
+    console.error('Error when trying to start game');
   } else {
-    console.log('Jogo iniciado com sucesso.');
+    console.log('Game started successfully');
   }
 }
 

@@ -59,14 +59,14 @@ export class GameModel {
   getGamePath(gameName: string): string {
     const basePath = app.isPackaged ? process.resourcesPath : app.getAppPath();
     const gamePath = path.join(basePath, 'roms', gameName);
-    log.info(`Gerado caminho do jogo: ${gamePath}`);
+    log.info(`Game path generated: ${gamePath}`);
     return gamePath;
   }
   
   getEmulatorPath(emulatorName: string): string {
     const basePath = app.isPackaged ? process.resourcesPath : app.getAppPath();
     const emulatorPath = path.join(basePath, 'emulators', emulatorName);
-    log.info(`Gerado caminho do emulador: ${emulatorPath}`);
+    log.info(`Emulator path generated: ${emulatorPath}`);
     return emulatorPath;
   }
 }

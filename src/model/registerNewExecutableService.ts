@@ -40,7 +40,7 @@ export class RegisterNewExecutablesService {
   
       const existingEmulator = await this.db.getEmulatorByName(emulatorName);
       if (existingEmulator) {
-        log.info(`Emulador já registrado: ${emulatorName}`);
+        log.info(`Emulator already registered: ${emulatorName}`);
         continue;
       }
       

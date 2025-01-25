@@ -35,14 +35,14 @@ export class GameController {
     ipcMain.handle('register-new-executables', async (event, executables: string[]): Promise<{ success: boolean; message: string }> => {
     
       if (!executables || executables.length === 0) {
-        return { success: false, message: 'Nenhum executável fornecido.' };
+        return { success: false, message: 'No executable given.' };
       }
     
       try {
         await this.gameModel.registerNewExecutables(executables);
-        return { success: true, message: 'Executáveis registrados com sucesso.' };
+        return { success: true, message: 'Executables registered successfully.' };
       } catch (error: any) {
-        console.error(`Erro ao registrar executáveis: ${error.message}`);
+        console.error(`Error ao when registering executables: ${error.message}`);
         return { success: false, message: error.message };
       }
     });
@@ -53,26 +53,26 @@ export class GameController {
     });
 
     ipcMain.handle('run-game', async (event, gameName: string, emulatorName: string) => {
-      log.info(`Run game executado! Jogo: ${gameName}, Emulador: ${emulatorName}`);
+      log.info(`Run game executed! Game: ${gameName}, Emulator: ${emulatorName}`);
       if (!emulatorName) {
-        log.error('Erro: Nome do emulador está indefinido.');
-        return { success: false, message: 'Nome do emulador está indefinido.' };
+        log.error('Error: Emulator name in undefined.');
+        return { success: false, message: 'Emulator name is undefined.' };
       }
     
       const gamePath = this.gameModel.getGamePath(gameName);
-      log.info(`Caminho do jogo: ${gamePath}`);
+      log.info(`Game path: ${gamePath}`);
       if (!gamePath) {
-        log.error('Erro: Caminho do jogo não encontrado.');
-        return { success: false, message: 'Caminho do jogo não encontrado.' };
+        log.error('Error: Game path not found.');
+        return { success: false, message: 'Game path not found.' };
       }
     
       if (this.isEmulatorRunning) {
-        log.warn('O emulador já está em execução.');
-        return { success: false, message: 'O emulador já está rodando.' };
+        log.warn('Emulator already running.');
+        return { success: false, message: 'Emulator already running.' };
       }
     
       this.runGame(gameName, emulatorName);
-      return { success: true, message: 'Jogo iniciado.' };
+      return { success: true, message: 'Game started' };
     });
 
     ipcMain.handle('is-emulator-running', () => {
@@ -84,21 +84,21 @@ export class GameController {
     const gamePath = this.gameModel.getGamePath(gameName);
     const emulatorPath = this.gameModel.getEmulatorPath(emulatorName + ".exe");
   
-    log.info(`Tentando iniciar o emulador: ${emulatorPath} com o jogo: ${gamePath}`);
+    log.info(`Trying to start emulator: ${emulatorPath} with game: ${gamePath}`);
   
     if (!gamePath || !fs.existsSync(gamePath)) {
-      log.error(`Erro: Caminho do jogo não encontrado: ${gamePath}`);
+      log.error(`Erro: Game path not found: ${gamePath}`);
       return;
     }
   
     if (!emulatorPath || !fs.existsSync(emulatorPath)) {
-      log.error(`Erro: Caminho do emulador não encontrado: ${emulatorPath}`);
+      log.error(`Erro: Emulator path not found: ${emulatorPath}`);
       return;
     }
   
     const mainWindow = BrowserWindow.getFocusedWindow();
     if (mainWindow) {
-      log.info('Ocultando janela principal antes de iniciar o emulador.');
+      log.info('Hiding main window before starting the emulator.');
       mainWindow.hide();
     }
   
@@ -108,22 +108,22 @@ export class GameController {
   
     const childProcess = exec(`"${emulatorPath}" "${gamePath}"`, (err, stdout, stderr) => {
       if (err) {
-        log.error(`Erro ao executar o emulador: ${err.message}`);
+        log.error(`Error when executing emulator: ${err.message}`);
         this.isEmulatorRunning = false;
         return;
       }
-      log.info(`Saída do emulador: ${stdout}`);
+      log.info(`Emulator output: ${stdout}`);
       if (stderr) {
-        log.warn(`Aviso do emulador: ${stderr}`);
+        log.warn(`Emulator's warning: ${stderr}`);
       }
     });
   
     childProcess.on('close', (code) => {
-      log.info(`O emulador foi encerrado com o código: ${code}`);
+      log.info(`The emulator was closed with the code: ${code}`);
       this.isEmulatorRunning = false;
   
       if (mainWindow) {
-        log.info('Restaurando a janela principal após o encerramento do emulador.');
+        log.info('Restoring the main window after closing the emulator.');
         mainWindow.show();
       }
     });

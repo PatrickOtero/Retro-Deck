@@ -17,9 +17,9 @@ function ensureDatabaseExists() {
       }
 
       fs.copyFileSync(dbSourcePath, dbDestinationPath);
-      log.info(`Banco de dados copiado para: ${dbDestinationPath}`);
+      log.info(`Database copied to: ${dbDestinationPath}`);
     } else {
-      log.info('Banco de dados já existe no local externo.');
+      log.info('Database is already on external location.');
     }
   }
 }
@@ -34,11 +34,11 @@ function ensureDirectoriesExist() {
     : path.join(app.getAppPath(), 'emulators');
 
   if (!fs.existsSync(romsPath)) {
-    log.warn(`Diretório "roms" não encontrado em: ${romsPath}`);
+    log.warn(`Roms directory not found at: ${romsPath}`);
   }
 
   if (!fs.existsSync(emulatorsPath)) {
-    log.warn(`Diretório "emulators" não encontrado em: ${emulatorsPath}`);
+    log.warn(`Emulators directory not found at: ${emulatorsPath}`);
   }
 }
 
@@ -54,8 +54,7 @@ log.transports.file.resolvePathFn = () => {
   return path.join(logResourcersPath, logFileName ?? 'default.log');
 };
 
-log.info('Configuração de logs inicializada. Logs serão salvos na área de trabalho.');
-log.error('Este é um exemplo de erro.');
+log.info('Logs configuration initialized. Logs will be saved inside resources folder on instalation directory.');
 
 app.disableHardwareAcceleration();
 app.commandLine.appendSwitch('disable-gpu');
@@ -63,7 +62,7 @@ app.commandLine.appendSwitch('disable-gpu');
 let mainWindow: BrowserWindow;
 
 function createWindow() {
-  log.info('Criando a janela principal...');
+  log.info('Creating main window...');
   mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
@@ -77,8 +76,8 @@ function createWindow() {
   });
 
   mainWindow.loadFile(path.join(__dirname, '..', 'src', 'views', 'index.html'))
-    .then(() => log.info('Janela principal carregada.'))
-    .catch((err) => log.error('Erro ao carregar a janela principal:', err));
+    .then(() => log.info('Main window loaded.'))
+    .catch((err) => log.error('Error when loading main window:', err));
 
   new GameController();
 
@@ -108,14 +107,14 @@ function createAboutWindow() {
 
   aboutWindow.setMenu(null);
   aboutWindow.loadFile(path.join(__dirname, '..', 'src', 'views', 'about.html'))
-    .then(() => log.info('Janela "Sobre" carregada.'))
-    .catch((err) => log.error('Erro ao carregar a janela "Sobre":', err));
+    .then(() => log.info('About window loaded.'))
+    .catch((err) => log.error('Error when loading "About" window:', err));
 }
 
 app.whenReady().then( async () => {
   ensureDatabaseExists()
   ensureDirectoriesExist();
-  log.info('Aplicativo pronto.');
+  log.info('Program ready.');
   createWindow();
 
   const menuTemplate: Electron.MenuItemConstructorOptions[] = [
@@ -137,15 +136,15 @@ app.whenReady().then( async () => {
 });
 
 app.on('window-all-closed', () => {
-  log.info('Todas as janelas foram fechadas.');
+  log.info('All windows were closed.');
   if (process.platform !== 'darwin') {
     app.quit();
-    log.info('Aplicativo encerrado.');
+    log.info('Program ended.');
   }
 });
 
 app.on('activate', () => {
-  log.info('Aplicativo ativado.');
+  log.info('Program activated.');
   if (BrowserWindow.getAllWindows().length === 0) {
     createWindow();
   }

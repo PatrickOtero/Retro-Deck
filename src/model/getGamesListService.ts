@@ -39,7 +39,7 @@ export class GameListService {
     try {
       const existingGame = await this.dbController.getGameByName(romName);
       if (existingGame) {
-        log.info("Game found in local database: " + existingGame);
+        log.info("Game found in local database: " + existingGame.gameName);
         existingGame.fileName = file;
         return existingGame;
       }
@@ -55,7 +55,7 @@ export class GameListService {
       const response = await axiosInstance.get<any>(`/searchGamesLocalDb/${romName}`);
       if (response.data?.game?.gameName && response.data?.localDB) {
         const game = response.data.game;
-        log.info("Game found in remote database: " + game);
+        log.info("Game found in remote database: " + game.gameName);
         game.fileName = file;
         await this.dbController.saveOrUpdateGames(game);
         return game;
@@ -73,6 +73,7 @@ export class GameListService {
       const responseRawg = await axiosInstance.get<any>(`/games/${romName}`);
       if (responseRawg.data?.game?.gameName && !responseRawg.data?.localDB) {
         const rawgGame = responseRawg.data.game;
+        log.info("Game found in RAWG database: " + rawgGame.gameName);
 
         return rawgGame;
       }

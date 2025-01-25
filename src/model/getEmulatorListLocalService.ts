@@ -18,12 +18,12 @@ export class EmulatorListLocalService {
   }
 
   async filterValidExecutables(files: string[]): Promise<string[]> {
-    log.info('Filtrando executáveis válidos na pasta de emuladores...');
+    log.info('Filtering valid executables in emulators folder...');
     return files.filter((file) => {
       const filePath = path.join(this.emulatorPath, file);
       const stats = fs.statSync(filePath);
       const isValid = stats.size > 2 * 1024 * 1024;
-      log.info(`Arquivo analisado: ${file}, Tamanho: ${stats.size}, Válido: ${isValid}`);
+      log.info(`File analyzed: ${file}, Size: ${stats.size}, Valid: ${isValid}`);
       return isValid;
     });
   }
@@ -33,20 +33,20 @@ export class EmulatorListLocalService {
       const files = fs.readdirSync(this.emulatorPath).filter((file) =>
         file.endsWith('.exe')
       );
-      log.info(`Arquivos executáveis encontrados: ${files}`);
+      log.info(`Executable files found: ${files}`);
 
       const validExecutables = await this.filterValidExecutables(files);
-      log.info(`Executáveis válidos: ${validExecutables}`);
+      log.info(`Valid executables: ${validExecutables}`);
 
       const emulatorDataPromises = validExecutables.map(async (validExecutable) => {
         const emulatorName = path.parse(validExecutable).name;
 
         try {
-          log.info(`Buscando informações do emulador no banco local: ${emulatorName}`);
+          log.info(`Fetching emulator information from local database ${emulatorName}`);
           const emulator = await this.dbController.getEmulatorByName(emulatorName);
 
           if (!emulator) {
-            log.warn(`Emulador não encontrado no banco local: ${emulatorName}`);
+            log.warn(`Emulator not found in local database: ${emulatorName}`);
             return null;
           }
 
@@ -56,7 +56,7 @@ export class EmulatorListLocalService {
 
           return emulator;
         } catch (error: any) {
-          log.error(`Erro ao buscar o emulador ${emulatorName}: ${error.message}`);
+          log.error(`Error searching for emulator ${emulatorName}: ${error.message}`);
           return null;
         }
       });
@@ -67,7 +67,7 @@ export class EmulatorListLocalService {
       
       return emulatorData.filter((emulator) => emulator !== null) as Emulator[];
     } catch (error: any) {
-      log.error(`Erro ao listar emuladores: ${error.message}`);
+      log.error(`Error listing emulators: ${error.message}`);
       return [];
     }
   }
