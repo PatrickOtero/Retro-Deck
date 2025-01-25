@@ -41,7 +41,11 @@ Se você já se cansou de abrir exploradores de arquivos para procurar ROMs ou a
 
 4. **Carrossel com informações dos jogos**  
    Lista de ROMs com descrições e imagens (quando disponíveis):  
-   _**![Carrossel de jogos(roms)](assets/readme/romsCarrousel.png)**_  
+   _**![Carrossel de jogos(roms)](assets/readme/romsCarrousel.png)**_
+
+5. **Janela "About"**  
+   Uma pequena janela que exibe minhas informações de contato:
+   _**![Janela de contato](assets/readme/aboutWindow.png)**_  
 
 ---
 
@@ -93,3 +97,14 @@ Se você já se cansou de abrir exploradores de arquivos para procurar ROMs ou a
 2. Crie uma branch para sua feature:  
    ```bash
    git checkout -b minha-feature
+3. Commit suas alterações:
+    ```bash
+    git commit -m "Adicionei uma nova feature"
+4. Submeta a branch
+    ```bash
+    git push origin minha-feature
+5. Abra um Pull Request explicando suas alterações
+
+## Agradecimentos
+
+### Muito obrigado por conferir o Retro Portal! Se tiver sugestões, feedback ou se encontrar problemas, abra uma issue ou entre em contato.
