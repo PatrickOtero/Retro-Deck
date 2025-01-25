@@ -18,7 +18,7 @@ Se você já se cansou de abrir exploradores de arquivos para procurar ROMs ou a
 ## **Limitações Conhecidas**  
 
 - **Informações incompletas de jogos**:  
-  O Retro Portal utiliza o serviço [RAWG](https://rawg.io) para obter dados como imagens e descrições dos jogos. No entanto, como o RAWG não possui informações de todos os jogos retrô, algumas ROMs podem aparecer sem dados adicionais.  
+  O Retro Portal utiliza o serviço [RAWG](https://rawg.io) para obter dados como imagens e descrições dos jogos. Quando você adiciona uma nova rom na pasta "roms" que não tem no meu banco de dados remoto, uma requisição é feita para a RAWG para encontrar informações e popular tanto o banco remoto quanto o seu banco local.
 
 - **Demora no carregamento de dados remotos**:  
   Minha API que gerencia o banco de dados está hospedada no [Render](https://render.com) com o plano free, o que significa que ela entra em modo "sleep" após períodos de inatividade. Por isso, o tempo para carregar informações pode variar caso a API esteja hibernando.  
