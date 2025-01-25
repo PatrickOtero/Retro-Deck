@@ -18,36 +18,8 @@ export class GameController {
 
   private setupIpcHandlers(): void {
 
-    ipcMain.handle('check-if-roms-exist', async (): Promise<{ message: string }> => {
-      const result = await this.gameModel.checkIfRomsExist();
-      return result;
-    });
-  
-    ipcMain.handle('get-local-games', async (event, supportedExtensions: string[]): Promise<Game[]> => {
-      const games = await this.gameModel.getLocalGamesList(supportedExtensions);
-      return games;
-    });
-
-    ipcMain.handle('search-and-save-games', async (event, supportedExtensions: string[]): Promise<{ message: string }[]> => {
-    
-      if (!supportedExtensions || supportedExtensions.length === 0) {
-        console.error('Nenhuma extensão fornecida.');
-        return [{ message: 'Nenhuma extensão fornecida.' }];
-      }
-    
-      const result = await this.gameModel.searchAndSaveGames(supportedExtensions);
-      return result;
-    });
-
     ipcMain.handle('get-games', async (event, supportedExtensions: string[]): Promise<Game[]> => {
-
-      if (!supportedExtensions || supportedExtensions.length === 0) {
-        console.error('Nenhuma extensão fornecida.');
-        return [];
-      }
-
-      const games = await this.gameModel.getGamesList(supportedExtensions);
-      return games;
+      return await this.gameModel.getGames(supportedExtensions);
     });
 
     ipcMain.handle('register-emulator', async (): Promise<{ message: string}[]> => {
